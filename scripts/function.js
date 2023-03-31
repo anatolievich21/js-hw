@@ -82,7 +82,7 @@ const checker = (log, pass) => {
     if (userLogin === log) {
         let userPassword = prompt('Введіть будь ласка ваш пароль')
         if (userPassword !== pass) {
-           return  alert('error')
+            return  alert('error')
         }
         return alert('Ви залогінились!')
     }
@@ -311,4 +311,33 @@ const tableCreatorFromArrayOfObjects = (arr, toSort, sortOrder= true) => {
 
 }
 
-//
+//Divide
+
+const divide = () => {
+    document.write(`
+        <input type='number' id='firstNumber' />
+        <input type='number' id='secondNumber' />
+        <div id='divisionResult'>
+            Текст у div
+        </div>
+        <script>
+            const division = (a, b) => {
+                return Math.floor(a / b);
+            }
+        
+            const updateResult = () => {
+                const first = parseInt(document.getElementById('firstNumber').value, 10);
+                const second = parseInt(document.getElementById('secondNumber').value, 10);
+                const result = division(first, second);
+                document.getElementById('divisionResult').innerHTML = \`Результат: \${result}\`;
+            };
+       
+            const firstNumber = document.getElementById('firstNumber');
+            const secondNumber = document.getElementById('secondNumber');
+            firstNumber.oninput = secondNumber.oninput = updateResult;
+        </script>
+    `);
+}
+
+//Calc Func
+
