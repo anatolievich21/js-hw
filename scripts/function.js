@@ -143,12 +143,29 @@ const arr2 = ['бляха', 'муха', "пляшка", "шабля"];
 const filterLexics = (str, arr) => str.split(' ').filter(el => !arr.includes(el)).join(' ');
 
 //Currency Table
-
-//     fetch('https://open.er-api.com/v6/latest/USD').then(res => res.json())
-//         .then(data => {
-//             return dataRates = data;
-//         });
-
+const currencyTable = () => {
+    const currencies = ['USD', 'EUR', 'UAH', 'PLN'];
+    const table = document.createElement('table');
+    const headerRow = document.createElement('tr');
+    headerRow.innerHTML = `<th></th>${currencies.map(currency => `<th>${currency}</th>`).join('')}`;
+    table.appendChild(headerRow);
+    currencies.forEach(fromCurrency => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<th>${fromCurrency}</th>`;
+        currencies.forEach(toCurrency => {
+            fetch(`https://open.er-api.com/v6/latest/${fromCurrency}`)
+                .then(res => res.json())
+                .then(data => {
+                    const rate = data.rates[toCurrency];
+                    const cell = document.createElement('td');
+                    cell.textContent = rate.toFixed(2);
+                    row.appendChild(cell);
+                });
+        });
+        table.appendChild(row);
+    });
+    document.body.appendChild(table);
+}
 
 //Form
 const car = {
@@ -339,5 +356,62 @@ const divide = () => {
     `);
 }
 
-//Calc Func
+//Calc Func&&Live
+const calcLive = () => {
+    document.write(`
+        <input type='number' id='firstNumber' />
+        <input type='number' id='secondNumber' />
+        <div id='divisionResult'>
+            Текст у div
+        </div>
+            <script>
+                const calc = (a = 1, b = 1) => {
+                
+                const addition = a + b;
+                const subtraction = a - b;
+                const multiplication = a * b;
+                const division = a / b;
+            
+                return {
+                    addition: addition.toFixed(2),
+                    subtraction: subtraction.toFixed(2),
+                    multiplication: multiplication.toFixed(2),
+                    division: division.toFixed(2),
+                }
+            }
+        
+            const updateResult = () => {
+                const first = Number(document.getElementById('firstNumber').value);
+                const second = Number(document.getElementById('secondNumber').value);
+                const result = calc(first, second);
+                
+                const div = document.getElementById("divisionResult");
 
+                while (div.firstChild) {
+                    div.removeChild(div.firstChild);
+                }
+              
+                const additionParagraph = document.createElement("p");
+                additionParagraph.textContent = "addition: " + result.addition;
+                
+                const subtractionParagraph = document.createElement("p");
+                subtractionParagraph.textContent = "subtraction: " + result.subtraction;
+                
+                const multiplicationParagraph = document.createElement("p");
+                multiplicationParagraph.textContent = "multiplication: " + result.multiplication;
+                
+                const divisionParagraph = document.createElement("p");
+                divisionParagraph.textContent = "division: " + result.division;
+               
+                div.appendChild(additionParagraph);
+                div.appendChild(subtractionParagraph);
+                div.appendChild(multiplicationParagraph);
+                div.appendChild(divisionParagraph);
+            };
+       
+            const firstNumber = document.getElementById('firstNumber');
+            const secondNumber = document.getElementById('secondNumber');
+            firstNumber.oninput = secondNumber.oninput = updateResult;
+        </script>
+    `);
+}
