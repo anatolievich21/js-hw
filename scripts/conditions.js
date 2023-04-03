@@ -276,8 +276,8 @@ const searcher = () => {
 
             for (let country in data) {
                 const option = document.createElement("option");
-                option.text = country;
-                countriesSelect.add(option);
+                option.innerText = country;
+                countriesSelect.appendChild(option);
             }
 
             countriesSelect.onchange = () => {
@@ -290,8 +290,8 @@ const searcher = () => {
 
                 for (let city of cities) {
                     const option = document.createElement("option");
-                    option.text = city;
-                    citiesSelect.add(option);
+                    option.innerText = city;
+                    citiesSelect.appendChild(option);
                 }
 
                 countryResult.innerText = `Обрано країну: ${selectedCountry}`;
