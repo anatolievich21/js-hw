@@ -7,22 +7,19 @@ const conversionToFahrenheit = (temp) => {
 
 //RGB
 const colorConversion = (red, green, blue) => {
-    const minValue = 10;
-    const maxValue = 'ff';
 
-    let hexRed = red.toString(16);
-    let hexGreen = green.toString(16);
-    let hexBlue = blue.toString(16);
+    const checkValue = (color) => {
+        if (color > 255){
+            return "ff"
+        }
+        return (color < 16) ? `0${color.toString(16)}` : color.toString(16);
+    }
 
-    if (red < 16) hexRed = minValue;
-    if (green < 16) hexGreen = minValue;
-    if (blue < 16) hexBlue = minValue;
+    const hexRed = checkValue(red);
+    const hexGreen = checkValue(green);
+    const hexBlue = checkValue(blue);
 
-    if (red > 255) hexRed = maxValue;
-    if (green > 255) hexGreen = maxValue;
-    if (blue > 255) hexBlue = maxValue;
-
-    return `#${hexRed}${hexGreen}${hexBlue}`
+    return `#${hexRed}${hexGreen}${hexBlue}`;
 }
 
 //flats

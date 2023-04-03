@@ -42,15 +42,18 @@ let a = 10
 //a = 100, !b, !c, !d
 // console.log(a)
 
+
+
+
 //comparison if
 const comprasionIf = () => {
 
     const age = + prompt ("Скільки вам років?", "");
 
-    if (!age){
-        alert("чи кіборг, чи KERNESS");
+    if (age < 0){
+        alert("можливо ви навіть не в планах)");
     }
-    else if (age < 18) {
+    else if (age > 0 && age < 18) {
         alert("школяр");
     }
     else if (age >= 18 && age < 30){
@@ -65,7 +68,13 @@ const comprasionIf = () => {
     else if (age >= 60) {
         alert("як пенсія?");
     }
+    else {
+        alert("чи кіборг, чи KERNESS");
+    }
 }
+
+
+
 //Comparison: sizes
 const comparsionSizes = () => {
 
@@ -101,6 +110,8 @@ const comparsionSizes = () => {
     }
 }
 
+
+
 //switch: if
 const switchIf = () => {
 
@@ -125,7 +136,11 @@ const switchIf = () => {
     }
 }
 
-//noswitch
+
+
+/////////////
+//noswitch//
+////////////
 const cases = {
     "воду": () =>{
         console.log('Найздоровіший вибір!');
@@ -157,8 +172,9 @@ const noSwitch = (key, cases, defaultKey='default') => {
 // noSwitch(drink, cases);
 
 
+
 //closure calc
-const ClosureCacl = () => {
+const closureCacl = () => {
 fetch('https://open.er-api.com/v6/latest/USD')
     .then(res => res.json())
     .then(data => {
@@ -182,4 +198,110 @@ fetch('https://open.er-api.com/v6/latest/USD')
 
 
 
+//closure calc 2
+const closureCalc2 = () => {
+    document.write(`
+        <select id="from"></select>>
+        <select id="to"></select>
+        <div id="rate"></div>
+        <input type="number" id="amount" />
+        <div id="result"></div>
+        `)
 
+    const fromSelect = document.getElementById('from');
+    const toSelect = document.getElementById('to');
+    const rateDiv = document.getElementById('rate');
+    const amountInput = document.getElementById('amount');
+    const resultDiv = document.getElementById('result');
+    let rates;
+
+    fetch('https://open.er-api.com/v6/latest/USD')
+        .then(res => res.json())
+        .then(data => {
+            rates = data.rates;
+            for (const currency in rates) {
+                const option = document.createElement('option');
+                option.innerText = currency;
+                fromSelect.appendChild(option);
+
+                const option2 = document.createElement('option');
+                option2.innerText = currency;
+                toSelect.appendChild(option2);
+            }
+            updateRate();
+            updateResult();
+        });
+
+    const updateRate = () => {
+        const fromCurrency = fromSelect.value;
+        const toCurrency = toSelect.value;
+        const rate = rates[toCurrency] / rates[fromCurrency];
+        rateDiv.innerText = `1 ${fromCurrency} = ${rate} ${toCurrency}`;
+        updateResult();
+    }
+
+    const updateResult = () => {
+        const fromCurrency = fromSelect.value;
+        const toCurrency = toSelect.value;
+        const rate = rates[toCurrency] / rates[fromCurrency];
+        const amount = amountInput.value;
+        const result = amount * rate;
+        resultDiv.innerText = `${result} ${toCurrency}`;
+    }
+
+    fromSelect.onchange = updateRate;
+    toSelect.onchange = updateRate;
+    amountInput.oninput = updateResult;
+}
+
+
+
+//countries and cities
+const searcher = () => {
+    document.write(`
+        <select id="countries"></select>
+        <select id="cities"></select>
+        <div id="countryResult"></div>
+        <div id="cityResult"></div>
+        `)
+
+    const countriesSelect = document.getElementById("countries");
+    const citiesSelect = document.getElementById("cities");
+    const countryResult = document.getElementById("countryResult");
+    const cityResult = document.getElementById("cityResult");
+
+    fetch('https://raw.githubusercontent.com/russ666/all-countries-and-cities-json/master/countries.min.json')
+        .then(res => res.json())
+        .then(data => {
+
+            for (let country in data) {
+                const option = document.createElement("option");
+                option.text = country;
+                countriesSelect.add(option);
+            }
+
+            countriesSelect.onchange = () => {
+
+                citiesSelect.innerHTML = "";
+                cityResult.innerText = "";
+
+                const selectedCountry = countriesSelect.value;
+                const cities = data[selectedCountry];
+
+                for (let city of cities) {
+                    const option = document.createElement("option");
+                    option.text = city;
+                    citiesSelect.add(option);
+                }
+
+                countryResult.innerText = `Обрано країну: ${selectedCountry}`;
+            }
+
+            citiesSelect.onchange = () => {
+
+                const selectedCity = citiesSelect.value;
+                cityResult.innerText = `Обрано місто: ${selectedCity}`;
+            }
+        });
+}
+searcher();
