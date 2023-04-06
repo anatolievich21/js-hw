@@ -91,3 +91,55 @@ const progressionSum = (num) => {
 
     console.log(sum);
 }
+
+
+
+//chess one line
+const chessOneLine = (length) =>{
+    let result = '';
+
+    for (let i = 0; i < length; i++){
+        result += (i % 2 === 0) ? '#' : ' ';
+    }
+
+    console.log(result)
+}
+
+//numbers
+const numbers = (num) =>{
+    let result = '';
+
+    for (let i = 0; i < num; i++){
+        for (let j = 0; j < num; j++) {
+            result += j;
+
+        }
+
+        result += '\n';
+    }
+
+    console.log(result);
+}
+
+
+
+//chess
+const chess = (row, col) =>{
+    let result = '';
+    let hex = '#';
+
+    for (let i = 0; i < row; i++){
+        if (col % 2 === 0) {
+            hex = (hex === '#') ? '.' : '#';
+        };
+
+        for (let j = 0; j < col; j++) {
+            result += hex;
+            hex = (hex === '#') ? '.' : '#';
+        };
+
+        result += '\n';
+    }
+
+    console.log(result);
+}
