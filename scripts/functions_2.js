@@ -49,21 +49,21 @@ function createPersonClosure (name, surname) {
         return `${surname} ${name} ${fatherName}`;
     };
     function setName(newName) {
-        if (typeof newName === 'string' && newName[0] === newName[0].toUpperCase()){
+        if (typeof newName === 'string' && newName[0] === newName.charAt(0).toUpperCase()){
             name = newName;
         }
 
         return name;
     };
     function setSurname(newSurname) {
-        if (typeof newSurname === 'string' && newSurname[0] === newSurname[0].toUpperCase()){
+        if (typeof newSurname === 'string' && newSurname[0] === newSurname.charAt(0).toUpperCase()){
             surname = newSurname;
         }
 
         return surname;
     };
     function setFatherName(newFatherName) {
-        if (typeof newFatherName === 'string' && newFatherName[0] === newFatherName[0].toUpperCase()){
+        if (typeof newFatherName === 'string' && newFatherName[0] === newFatherName.charAt(0).toUpperCase()){
             fatherName = newFatherName;
         }
 
@@ -122,21 +122,21 @@ function createPersonClosureDestruct ({name = '', surname = '', age = 0, fatherN
         return `${surname} ${name} ${fatherName}`;
     };
     function setName(newName) {
-        if (typeof newName === 'string' && newName[0] === newName[0].toUpperCase()){
+        if (typeof newName === 'string' && newName[0] === newName.charAt(0).toUpperCase()){
             name = newName;
         }
 
         return name;
     };
     function setSurname(newSurname) {
-        if (typeof newSurname === 'string' && newSurname[0] === newSurname[0].toUpperCase()){
+        if (typeof newSurname === 'string' && newSurname[0] === newSurname.charAt(0).toUpperCase()){
             surname = newSurname;
         }
 
         return surname;
     };
     function setFatherName(newFatherName) {
-        if (typeof newFatherName === 'string' && newFatherName[0] === newFatherName[0].toUpperCase()){
+        if (typeof newFatherName === 'string' && newFatherName[0] === newFatherName.charAt(0).toUpperCase()){
             fatherName = newFatherName;
         }
 
@@ -229,3 +229,67 @@ function arrayFill () {
     console.log(numbers)
     return isSorted(numbers);
 }
+
+
+
+//personForm
+function personForm (parent, person){
+    const nameInput = document.createElement('input');
+    const surnameInput = document.createElement('input');
+    const fatherNameInput = document.createElement('input');
+    const ageInput = document.createElement('input');
+    const fullNameInput = document.createElement('input');
+
+    nameInput.value = person.getName();
+    surnameInput.value = person.getSurname();
+    fatherNameInput.value = person.getFatherName();
+    ageInput.value = person.getAge();
+    fullNameInput.value = person.getFullName();
+
+    parent.appendChild(nameInput);
+    parent.appendChild(surnameInput);
+    parent.appendChild(fatherNameInput);
+    parent.appendChild(ageInput);
+    parent.appendChild(fullNameInput);
+
+    nameInput.oninput = (event) => {
+        const newName = event.target.value;
+        const updatedName = person.setName(newName);
+        event.target.value = updatedName;
+    };
+
+    surnameInput.oninput = (event) => {
+        const newSurname = event.target.value;
+        const updatedSurname = person.setSurname(newSurname);
+        event.target.value = updatedSurname;
+    };
+
+    fatherNameInput.oninput = (event) => {
+        const newFatherName = event.target.value;
+        const updatedFatherName = person.setName(newFatherName);
+        event.target.value = updatedFatherName;
+    };
+
+    ageInput.oninput = (event) => {
+        const newAge = event.target.value;
+        const updatedAge = person.setName(newAge);
+        event.target.value = updatedAge;
+    };
+
+    fullNameInput.oninput = (event) => {
+        const newFullName = event.target.value;
+        const updatedFullName = person.setName(newFullName);
+        event.target.value = updatedFullName;
+    };
+
+}
+
+
+
+const div = document.createElement('div')
+document.body.appendChild(div)
+const b = createPersonClosure("Ганна", "Іванова")
+b.setAge(15)
+b.setFullName("Петрова Ганна Миколаївна")
+
+personForm(div, b)
