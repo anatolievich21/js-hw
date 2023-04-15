@@ -49,8 +49,8 @@ function createPersonClosure (name, surname) {
         return `${surname} ${name} ${fatherName}`;
     };
     function setName(newName) {
-        if (typeof newName === 'string' && newName[0] === newName.charAt(0).toUpperCase()){
-            name = newName;
+        if (typeof newName === 'string'){
+            name = newName.charAt(0).toUpperCase() + newName.slice(1);
         }
 
         return name;
@@ -266,20 +266,23 @@ function personForm (parent, person){
 
     fatherNameInput.oninput = (event) => {
         const newFatherName = event.target.value;
-        const updatedFatherName = person.setName(newFatherName);
+        const updatedFatherName = person.setFatherName(newFatherName);
         event.target.value = updatedFatherName;
     };
 
     ageInput.oninput = (event) => {
-        const newAge = event.target.value;
-        const updatedAge = person.setName(newAge);
+        const newAge = Number(event.target.value);
+        const updatedAge = person.setAge(newAge);
         event.target.value = updatedAge;
     };
 
     fullNameInput.oninput = (event) => {
         const newFullName = event.target.value;
-        const updatedFullName = person.setName(newFullName);
+        const updatedFullName = person.setFullName(newFullName);
         event.target.value = updatedFullName;
+        nameInput.value = person.getName();
+        surnameInput.value = person.getSurname();
+        fatherNameInput.value = person.getFatherName();
     };
 
 }
