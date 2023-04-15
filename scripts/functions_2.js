@@ -184,5 +184,48 @@ function isSorted (...arr) {
             return false;
         }
     }
+
     return true;
 };
+
+
+
+//Test isSorted
+function arrayFill () {
+    const numbers = [];
+
+    while (true) {
+        const input = prompt('Введіть число:');
+
+        if (input === null) {
+            break;
+        }
+
+        const number = Number(input);
+
+        if (isNaN(number)) {
+            numbers.push(NaN);
+        }
+        else{
+            numbers.push(number);
+        }
+
+    }
+
+    function isSorted (arr) {
+        if (arr.length === 0){
+            return false;
+        };
+
+        for (let i = 0; i < arr.length - 1; i++) {
+            if (isNaN(arr[i]) || isNaN(arr[i + 1]) || typeof arr[i] !== 'number' || typeof arr[i + 1] !== 'number' || arr[i] >= arr[i + 1]) {
+                return false;
+            }
+        };
+
+        return true;
+    };
+
+    console.log(numbers)
+    return isSorted(numbers);
+}
