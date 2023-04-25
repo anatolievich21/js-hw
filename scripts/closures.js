@@ -31,30 +31,21 @@ function makeSaver(func) {
 //myBind
 function myBind(func, context, defaultArgs) {
     return function (...args) {
-        const mergedArgs = [];
-        let defaultArgsIndex = 0;
 
-        for (let i = 0; i < args.length; i++) {
+        for (let i = 0; i < defaultArgs.length; i++) {
 
-            if (args[i] !== undefined) {
-                mergedArgs.push(args[i]);
-            } else {
-
-                if (defaultArgs[defaultArgsIndex] !== undefined) {
-                    mergedArgs.push(defaultArgs[defaultArgsIndex]);
-                }
+            if (defaultArgs[i] === undefined) {
+                defaultArgs[i] = args.shift();
             }
-            defaultArgsIndex++;
+
+            if (args.length === 0) {
+                break;
+            }
         }
 
-        if (defaultArgsIndex < defaultArgs.length) {
-            mergedArgs.push(...defaultArgs.slice(defaultArgsIndex));
-        }
+        console.log(defaultArgs)
 
-        const filteredMergedArgs = mergedArgs.filter(item => item !== undefined);
-        // console.log(filteredMergedArgs)
-
-        return func.apply(context, filteredMergedArgs);
+        return func.apply(context, defaultArgs);
     }
 }
 
