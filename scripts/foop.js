@@ -37,16 +37,24 @@ function Person(name, surname){
 
 //Password
 
-function Password(parent, open) {
+function Password(parent, open){
     const inputPassword = document.createElement('input');
-    inputPassword.type = 'password'
+    inputPassword.type = 'password';
     inputPassword.placeholder = 'password';
     inputPassword.oninput = () => this.setValue(inputPassword.value);
+    inputPassword.style.cssText = `
+        display: block;
+        max-width: 300px;
+    `;
     parent.appendChild(inputPassword);
 
     const checkVisible = document.createElement('input');
     checkVisible.type = 'checkbox';
     checkVisible.oninput = () => this.setOpen(checkVisible.checked);
+    checkVisible.style.cssText = `
+        display: block;
+        max-width: 300px;
+    `;
     parent.appendChild(checkVisible);
 
     this.getValue = () => inputPassword.value;
@@ -82,13 +90,53 @@ function Password(parent, open) {
     };
 
     this.setOpen(open);
-    this.setStyle('2px solid purple');
+    this.setStyle('2px solid grey');
 }
 
-// let p = new Password(document.body, true)
-// p.onChange = data => console.log(data)  //буде корисно при виконаннi LoginForm та Password Verify
-// p.onOpenChange = open => console.log(open)
-// p.setValue('qwerty')
-// console.log(p.getValue())
-// p.setOpen(false)
-// console.log(p.getOpen())
+
+
+//LoginForm
+
+function LoginForm(parent) {
+    const form = document.createElement('form');
+    form.style.display = 'flex';
+    form.style.flexDirection = 'column';
+    parent.appendChild(form);
+
+    const usernameInput = document.createElement('input');
+    usernameInput.type = 'text';
+    usernameInput.placeholder = 'username';
+    usernameInput.style.cssText = `
+        display: block;
+        max-width: 300px;
+        border: 2px solid grey;
+    `;
+    form.appendChild(usernameInput);
+
+    const password = new Password(form, false);
+
+    const submitButton = document.createElement('button');
+    submitButton.type = 'submit';
+    submitButton.disabled = true;
+    submitButton.style.cssText = `
+        display: block;
+        max-width: 300px;
+        border: 2px solid grey;
+    `;
+    submitButton.textContent = 'Log In';
+    form.appendChild(submitButton);
+
+    const validateForm = () => {
+        submitButton.disabled = usernameInput.value === '' || password.getValue() === '';
+    }
+
+    usernameInput.oninput = validateForm;
+    password.onChange = validateForm;
+
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        console.log(`Login: ${usernameInput.value}; Password: ${password.getValue()}`);
+    }
+}
+
+const loginForm = new LoginForm(document.body);
