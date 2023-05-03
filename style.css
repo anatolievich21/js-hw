@@ -5,22 +5,118 @@
     margin: 0;
     border: 0;
     box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
 }
 
-html,
 body {
-    height: 100%;
-    background-color: #333;
-    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 50px;
+}
+
+header .cashRegister{
+    font-size: 24px;
+    font-weight: 600;
+}
+
+main {
+    display: flex;
+    margin: auto;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+}
+
+.cards{
+    display: flex;
+    justify-content: space-between;
+
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    min-width: 230px;
+    height: 280px;
+    margin: 15px;
+    justify-content: space-around;
+    align-items: center;
+    border: 2px solid black;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.itemsInCard h2 {
+    font-size: 36px;
+}
+
+.img img {
+    max-width: 120px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.buyMenu {
+    margin-top: 50px;
+    display: flex;
+    justify-content: start;
+}
+
+#goods,
+#quantityOfGoods,
+#money {
+    width: 150px;
+    height: 55px;
+    margin: 15px;
+    background-color: rgba(155, 212, 236, 0.47);
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+    border: none;
+}
+
+.buyButton {
+    display: flex;
+    margin: 15px;
+
+}
+
+#buy {
+    width: 150px;
+    height: 55px;
+    font-size: 20px;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: #ccc;
+    color: #333;
+    border: 2px solid #666;
+}
+
+#buy:hover {
+    background-color: #0a6052;
     color: #fff;
-    font-size: 16px;
-    padding: 30px;
 }
 
-h1 {
-    margin: 0px 0px 20px 0px;
+#buy:active {
+    background-color: #15a896;
+    color: #fff;
+    border-color: #333;
+ }
+
+
+#info{
+    height: 55px;
+    margin: 15px 30px;
+    font-size: 20px;
 }
 
-.yellow {
-    color: rgb(231, 231, 0);
-}
