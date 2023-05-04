@@ -20,30 +20,18 @@ function reducer(state, {type, what, amount, money}){
         }
     }
 
-    function resetForm() {
-        document.getElementById('buy').addEventListener('click', () => {
-            document.getElementById('quantityOfGoods').value = '';
-            document.getElementById('money').value = '';
-            document.getElementById('info').innerHTML = '';
-        });
-    }
-
     if (type === 'buy'){
         if (amount > state[what].quantity) {
-            resetForm();
             document.getElementById('info').innerHTML = `Вибачте, у нас недостатньо товару`;
             return state;
         } else if (money < amount * state[what].price) {
-            resetForm();
             document.getElementById('info').innerHTML = `Недостатньо коштів!`;
             return state;
         } else if (!state[what].quantity) {
-            resetForm();
             document.getElementById('info').innerHTML = `Вибачте, товар тимчасово відсутній`;
             return state;
         } else if (money >= amount * state[what].price){
             const total = amount * state[what].price;
-            resetForm();
             document.getElementById('info').innerHTML = `Ви придбали ${amount} ${what} за ${total} грн. Ваша здача: ${money - total} грн`;
 
 
@@ -106,6 +94,7 @@ function update() {
     chipsPrice.textContent = store.getState().chips.price;
     cigiPrice.textContent = store.getState().cigi.price;
     cash.textContent = store.getState().casa;
+    document.title = `Kaса: ${cash.textContent}`;
 }
 
 store.subscribe(update);
@@ -114,8 +103,18 @@ document.getElementById('buy').addEventListener('click', () => {
     const selectedGoods = goodsSelect.value;
     const amount = Number(quantityOfGoods.value);
     const money = Number(moneyInput.value);
-
     store.dispatch({ type: 'buy', what: selectedGoods, amount, money });
+
+    quantityOfGoods.value = '';
+    moneyInput.value = '';
+
+    let timerId = setTimeout(() => {
+        info.innerHTML = '';
+    }, 3000);
+
+    document.getElementById('buy').addEventListener('click', () => {
+        clearTimeout(timerId);
+    });
 });
 
 update();
@@ -124,8 +123,4 @@ goodsSelect.innerHTML = `
     <option value="chips">Чіпси</option>
     <option value="cigi">Цигарки</option>
 `;
-
-quantityOfGoods.value = '';
-moneyInput.value = '';
-info.innerHTML = '';
 
