@@ -1,126 +1,199 @@
-//redux Homework
+// //HTML tree
 
-function reducer(state, {type, what, amount, money}){
-    if (!state){
-        return {
-            beer: {
-                quantity: 300,
-                price: 60,
-            },
-            chips: {
-                quantity: 500,
-                price: 50,
-            },
-            cigi: {
-                quantity: 100,
-                price: 100,
-            },
+const table = {
+    tagName: "table",
+    attrs: {
+        border: "1",
+    },
+    children: [
+        {
+            tagName: "tr",
+            children: [
+                {
+                    tagName: "td",
+                    children: ["1x1"],
+                },
+                {
+                    tagName: "td",
+                    children: ["1x2"],
+                    attrs: {
+                        border: "1",
+                    },
+                },
+            ],
+        },
+        {
+            tagName: "tr",
+            children: [
+                {
+                    tagName: "td",
+                    children: ["2x1"],
+                },
+                {
+                    tagName: "td",
+                    children: ["2x2"],
+                },
+            ],
+        },
+    ],
+};
 
-            casa: 0,
+
+const htmlTree = (node) => {
+    let html = '<' + node.tagName;
+
+    if (node.attrs) {
+        for (const attr in node.attrs) {
+            html += ` ${attr}='${node.attrs[attr]}'`;
         }
     }
 
-    if (type === 'buy'){
-        if (amount > state[what].quantity) {
-            document.getElementById('info').innerHTML = `Вибачте, у нас недостатньо товару`;
-            return state;
-        } else if (money < amount * state[what].price) {
-            document.getElementById('info').innerHTML = `Недостатньо коштів!`;
-            return state;
-        } else if (!state[what].quantity) {
-            document.getElementById('info').innerHTML = `Вибачте, товар тимчасово відсутній`;
-            return state;
-        } else if (money >= amount * state[what].price){
-            const total = amount * state[what].price;
-            document.getElementById('info').innerHTML = `Ви придбали ${amount} ${what} за ${total} грн. Ваша здача: ${money - total} грн`;
+    if (!node.children || node.children.length === 0) {
+        html += '/>';
+        return html;
+    }
 
-
-            money = amount * state[what].price;
-            return {
-                ...state,
-                [what]: { quantity: state[what].quantity - amount, price: state[what].price },
-                casa: state.casa + money,
-            }
+    html += '>';
+    for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        if (typeof child === 'string') {
+            html += child;
         } else {
-            return state
+            html += htmlTree(child);
         }
+    }
+
+    html += '</' + node.tagName + '>';
+
+    return html;
+}
+
+// console.log(htmlTree(table))
+// document.write(htmlTree(table));
+
+
+
+// Рекурсія: DOM tree
+
+const domTree = (parent, node) => {
+    const element = document.createElement(node.tagName);
+
+    if (node.attrs) {
+        for (const attr in node.attrs) {
+            element.setAttribute(attr, node.attrs[attr]);
+        }
+    }
+
+    if (node.children && node.children.length > 0) {
+        for (const child of node.children) {
+            if (typeof child === 'string') {
+                element.appendChild(document.createTextNode(child));
+            } else {
+                domTree(element, child);
+            }
+        }
+    }
+
+    parent.appendChild(element);
+}
+
+// domTree(document.body, table);
+
+
+
+//Рекурсія: Deep Copy
+
+function deepCopy(copied) {
+    if (copied === null || typeof copied !== "object") {
+        return copied;
+    }
+
+    let copy = Array.isArray(copied) ? [] : {};
+
+    for (let key in copied) {
+        copy[key] = deepCopy(copied[key]);
+    }
+
+    return copy;
+}
+
+const arr  = [1,"string", null, undefined, {a: 15, b: 10, c: [1,2,3,4],d: undefined, e: true }, true, false];
+// const arr2 = deepCopy(arr);
+// const table2 = deepCopy(table);
+//
+// console.log(arr);
+// console.log(arr2);
+
+
+
+//Рекурсия: My Stringify
+
+const stringify = (obj) => {
+    if (obj === null || obj === undefined) {
+        return "null";
+
+    } else if (typeof obj === "number" || typeof obj === "boolean") {
+        return obj.toString();
+
+    } else if (typeof obj === "string") {
+        return '"' + obj + '"';
+
+    } else if (Array.isArray(obj)) {
+        const arr = obj.map((element) => stringify(element));
+        return "[" + arr.join(",") + "]";
+
+    } else if (typeof obj === "object") {
+        const keys = Object.keys(obj);
+        const arr = keys.map((key) => {
+            const value = stringify(obj[key]);
+            if (value === undefined) {
+                return "";
+            } else {
+                return '"' + key + '":' + value;
+            }
+        });
+        return "{" + arr.join(",") + "}";
     }
 }
 
-function createStore(reducer) {
-    let state = reducer(undefined, {});
-    let cbs = [];
+// const jsonString = stringify(arr);
+// const jsonString2 = stringify(table);
+// console.log(JSON.parse(jsonString));
+// console.log(JSON.parse(jsonString2));
 
-    const getState = () => state;
-    const subscribe = (cb) => {
-        cbs.push(cb);
-        return () => (cbs) = cbs.filter((c) => c !== cb);
-    };
 
-    const dispatch = (action) => {
-        const newState = reducer(state, action);
-        if (newState !== state) {
-            state = newState;
-            for (let cb of cbs) cb();
+
+////Рекурсія: getElementById throw
+const getElementById = (idToFind) => {
+    function walker(parent) {
+        if (parent.id === idToFind) {
+            throw parent;
         }
-    };
 
-    return {
-        getState,
-        dispatch,
-        subscribe,
-    };
+        if (parent.children) {
+            for (let i = 0; i < parent.children.length; i++) {
+                walker(parent.children[i]);
+            }
+        }
+    }
+
+    try {
+        walker(document.body);
+    } catch (element) {
+        return element;
+    }
+
+    return null;
 }
 
-const quantityOfGoods = document.getElementById('quantityOfGoods');
-const moneyInput = document.getElementById('money');
-const info = document.getElementById('info');
-const goodsSelect = document.getElementById('goods');
-const beerQuantity = document.getElementById('beerQuantity');
-const chipsQuantity = document.getElementById('chipsQuantity');
-const cigiQuantity = document.getElementById('cigiQuantity');
-const beerPrice = document.getElementById('beerPrice');
-const chipsPrice = document.getElementById('chipsPrice');
-const cigiPrice = document.getElementById('cigiPrice');
-const cash = document.getElementById('cash');
+// const div = document.createElement('div')
+// document.body.append(div);
+// div.id = 'test';
+// div.innerText = 'Hello world!';
+//
+// console.log(getElementById('test'))
 
-const store = createStore(reducer);
 
-function update() {
-    beerQuantity.textContent = store.getState().beer.quantity;
-    chipsQuantity.textContent = store.getState().chips.quantity;
-    cigiQuantity.textContent = store.getState().cigi.quantity;
-    beerPrice.textContent = store.getState().beer.price;
-    chipsPrice.textContent = store.getState().chips.price;
-    cigiPrice.textContent = store.getState().cigi.price;
-    cash.textContent = store.getState().casa;
-    document.title = `Kaса: ${cash.textContent}`;
-}
 
-store.subscribe(update);
 
-document.getElementById('buy').addEventListener('click', () => {
-    const selectedGoods = goodsSelect.value;
-    const amount = Number(quantityOfGoods.value);
-    const money = Number(moneyInput.value);
-    store.dispatch({ type: 'buy', what: selectedGoods, amount, money });
-
-    quantityOfGoods.value = '';
-    moneyInput.value = '';
-
-    let timerId = setTimeout(() => {
-        info.innerHTML = '';
-    }, 3000);
-
-    document.getElementById('buy').addEventListener('click', () => {
-        clearTimeout(timerId);
-    });
-});
-
-update();
-goodsSelect.innerHTML = `
-    <option value="beer">Пиво</option>
-    <option value="chips">Чіпси</option>
-    <option value="cigi">Цигарки</option>
-`;
 
