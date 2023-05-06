@@ -24,3 +24,14 @@ h1 {
 .yellow {
     color: rgb(231, 231, 0);
 }
+
+.json-table {
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+.json-table th,
+.json-table td {
+    border: 2px solid gray;
+    padding: 5px;
+}

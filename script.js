@@ -1,199 +1,176 @@
-// //HTML tree
+//fetch basic
 
-const table = {
-    tagName: "table",
-    attrs: {
-        border: "1",
-    },
-    children: [
-        {
-            tagName: "tr",
-            children: [
-                {
-                    tagName: "td",
-                    children: ["1x1"],
-                },
-                {
-                    tagName: "td",
-                    children: ["1x2"],
-                    attrs: {
-                        border: "1",
-                    },
-                },
-            ],
-        },
-        {
-            tagName: "tr",
-            children: [
-                {
-                    tagName: "td",
-                    children: ["2x1"],
-                },
-                {
-                    tagName: "td",
-                    children: ["2x2"],
-                },
-            ],
-        },
-    ],
-};
+// const func1 = (DOM, JSON) => {
+//     const table = document.createElement('table');
+//     table.classList.add('json-table');
+//
+//     const tableHeaderRow = document.createElement('tr');
+//     table.appendChild(tableHeaderRow);
+//
+//     for (const headerKey in JSON) {
+//         const th = document.createElement('th');
+//         th.innerText = headerKey;
+//         tableHeaderRow.appendChild(th);
+//     }
+//
+//     const tableBodyRow = document.createElement('tr');
+//     table.appendChild(tableBodyRow);
+//
+//     for (const headerKey in JSON){
+//         const td = document.createElement('td');
+//         td.innerText = JSON[headerKey];
+//         tableBodyRow.appendChild(td)
+//     }
+//
+//     DOM.appendChild(table);
+// }
+
+const URL = 'https://swapi.dev/api/people/1/';
+
+// fetch(URL)
+//     .then(res => res.json())
+//     .then(data => {
+//         func1(document.body, data);
+//     });
 
 
-const htmlTree = (node) => {
-    let html = '<' + node.tagName;
 
-    if (node.attrs) {
-        for (const attr in node.attrs) {
-            html += ` ${attr}='${node.attrs[attr]}'`;
-        }
+//fetch improved
+
+const func2 = (DOM, data) => {
+    const table = document.createElement('table');
+    table.classList.add('json-table');
+
+    const tableHeaderRow = document.createElement('tr');
+    table.appendChild(tableHeaderRow);
+
+    for (const headerKey in data) {
+        const th = document.createElement('th');
+        th.innerText = headerKey;
+        tableHeaderRow.appendChild(th);
     }
 
-    if (!node.children || node.children.length === 0) {
-        html += '/>';
-        return html;
-    }
+    const tableBodyRow = document.createElement('tr');
+    table.appendChild(tableBodyRow);
 
-    html += '>';
-    for (let i = 0; i < node.children.length; i++) {
-        const child = node.children[i];
-        if (typeof child === 'string') {
-            html += child;
+    for (const headerKey in data){
+        const td = document.createElement('td');
+        const value = data[headerKey];
+
+        if (typeof value === 'string' && value.startsWith('https://swapi.dev/api/')) {
+            const button = document.createElement('button');
+            button.innerText = value;
+            button.addEventListener('click', () => {
+                fetch(value)
+                    .then(res => res.json())
+                    .then(newData => {
+                        func2(td, newData);
+                    });
+            });
+            td.appendChild(button);
+        } else if (Array.isArray(value) || typeof value === 'object') {
+            func2(td, value);
         } else {
-            html += htmlTree(child);
+            td.innerText = value;
         }
+
+        tableBodyRow.appendChild(td)
     }
 
-    html += '</' + node.tagName + '>';
-
-    return html;
+    DOM.appendChild(table);
 }
 
-// console.log(htmlTree(table))
-// document.write(htmlTree(table));
+// fetch(URL)
+//     .then(res => res.json())
+//     .then(data => {
+//         func2(document.body, data);
+//     });
 
 
 
-// Рекурсія: DOM tree
+//race
 
-const domTree = (parent, node) => {
-    const element = document.createElement(node.tagName);
-
-    if (node.attrs) {
-        for (const attr in node.attrs) {
-            element.setAttribute(attr, node.attrs[attr]);
-        }
-    }
-
-    if (node.children && node.children.length > 0) {
-        for (const child of node.children) {
-            if (typeof child === 'string') {
-                element.appendChild(document.createTextNode(child));
-            } else {
-                domTree(element, child);
-            }
-        }
-    }
-
-    parent.appendChild(element);
-}
-
-// domTree(document.body, table);
-
-
-
-//Рекурсія: Deep Copy
-
-function deepCopy(copied) {
-    if (copied === null || typeof copied !== "object") {
-        return copied;
-    }
-
-    let copy = Array.isArray(copied) ? [] : {};
-
-    for (let key in copied) {
-        copy[key] = deepCopy(copied[key]);
-    }
-
-    return copy;
-}
-
-const arr  = [1,"string", null, undefined, {a: 15, b: 10, c: [1,2,3,4],d: undefined, e: true }, true, false];
-// const arr2 = deepCopy(arr);
-// const table2 = deepCopy(table);
+// const myfetch = new Promise(resolve => {
+//     setTimeout(() => {
+//         resolve({ message: "Delay was faster" });
+//     }, 1000); // підбираємо параметр delay
+// });
 //
-// console.log(arr);
-// console.log(arr2);
+// const apiFetch = fetch("https://swapi.dev/api/people/1/").then(res => res.json());
+//
+// Promise.race([myfetch, apiFetch])
+//     .then(result => {
+//         console.log(result);
+//     })
+//     .catch(error => {
+//         console.error(error);
+//     });
 
 
 
-//Рекурсия: My Stringify
+//Promisify: confirm
 
-const stringify = (obj) => {
-    if (obj === null || obj === undefined) {
-        return "null";
+// function confirmPromise(text) {
+//     return new Promise((resolve, reject) => {
+//         const confirmed = confirm(text);
+//         if (confirmed) {
+//             resolve();
+//         } else {
+//             reject();
+//         }
+//     });
+// }
+//
+// confirmPromise("Проміси це складно?")
+//     .then(() => console.log("Не так вже й складно"))
+//     .catch(() => console.log("Respect за посидючість і уважність"));
 
-    } else if (typeof obj === "number" || typeof obj === "boolean") {
-        return obj.toString();
 
-    } else if (typeof obj === "string") {
-        return '"' + obj + '"';
 
-    } else if (Array.isArray(obj)) {
-        const arr = obj.map((element) => stringify(element));
-        return "[" + arr.join(",") + "]";
+//Promisify: prompt
 
-    } else if (typeof obj === "object") {
-        const keys = Object.keys(obj);
-        const arr = keys.map((key) => {
-            const value = stringify(obj[key]);
-            if (value === undefined) {
-                return "";
-            } else {
-                return '"' + key + '":' + value;
-            }
+// function promptPromise(text) {
+//     return new Promise((resolve, reject) => {
+//         const result = prompt(text);
+//         if (result !== null) {
+//             resolve(result);
+//         } else {
+//             reject();
+//         }
+//     });
+// }
+//
+// promptPromise("Як тебе звуть?").then(
+//     (name) => console.log(`Тебе звуть ${name}`),
+//     () => console.log("Ну навіщо морозитися, нормально ж спілкувалися")
+// );
+
+
+
+//Promisify: LoginForm
+
+
+
+function loginPromise(parent) {
+    function executor(resolve, reject) {
+        const form = new LoginForm(parent);
+
+        form.onSubmit(({ login, password }) => {
+            resolve({ login, password });
         });
-        return "{" + arr.join(",") + "}";
+
+        form.onCancel(() => {
+            reject(new Error('Login cancelled'));
+        });
     }
+
+    return new Promise(executor);
 }
 
-// const jsonString = stringify(arr);
-// const jsonString2 = stringify(table);
-// console.log(JSON.parse(jsonString));
-// console.log(JSON.parse(jsonString2));
-
-
-
-////Рекурсія: getElementById throw
-const getElementById = (idToFind) => {
-    function walker(parent) {
-        if (parent.id === idToFind) {
-            throw parent;
-        }
-
-        if (parent.children) {
-            for (let i = 0; i < parent.children.length; i++) {
-                walker(parent.children[i]);
-            }
-        }
-    }
-
-    try {
-        walker(document.body);
-    } catch (element) {
-        return element;
-    }
-
-    return null;
-}
-
-// const div = document.createElement('div')
-// document.body.append(div);
-// div.id = 'test';
-// div.innerText = 'Hello world!';
-//
-// console.log(getElementById('test'))
-
-
-
-
-
+loginPromise(document.body)
+    .then(({ login, password }) => {
+        console.log(`Ви ввели ${login} та ${password}`);
+    })
+    .catch((error) => {
+        console.log(error.message);
+    });
