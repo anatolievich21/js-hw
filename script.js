@@ -151,26 +151,3 @@ const func2 = (DOM, data) => {
 
 
 
-function loginPromise(parent) {
-    function executor(resolve, reject) {
-        const form = new LoginForm(parent);
-
-        form.onSubmit(({ login, password }) => {
-            resolve({ login, password });
-        });
-
-        form.onCancel(() => {
-            reject(new Error('Login cancelled'));
-        });
-    }
-
-    return new Promise(executor);
-}
-
-loginPromise(document.body)
-    .then(({ login, password }) => {
-        console.log(`Ви ввели ${login} та ${password}`);
-    })
-    .catch((error) => {
-        console.log(error.message);
-    });
