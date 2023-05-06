@@ -140,3 +140,102 @@ function LoginForm(parent) {
 }
 
 const loginForm = new LoginForm(document.body);
+
+
+
+//LoginForm Constructor
+
+// function LoginForm(parent, open) {
+//   const inputLogin = document.createElement("input");
+//   inputLogin.placeholder = "Login";
+//   inputLogin.oninput = () => {
+//     this.setLogin(inputLogin.value);
+//     this.disabledButton();
+//   };
+//   parent.appendChild(inputLogin);
+
+//   const inputPass = new Password(parent, open);
+//   inputPass.onChange = () => {
+//     this.disabledButton();
+//   };
+
+//   const submitButton = document.createElement("input");
+//   submitButton.type = "submit";
+//   submitButton.value = "Відправити";
+//   submitButton.onclick = () => {
+//     console.log(
+//       `Sending login and password: ${this.getLogin()}, ${inputPass.getValue()}`
+//     );
+//     this.setLogin("");
+//     inputPass.setValue("");
+//     this.disabledButton();
+//   };
+//   container.appendChild(submitButton);
+
+//   this.getLogin = () => inputLogin.value;
+
+//   this.setLogin = (newLogin) => {
+//     inputLogin.value = newLogin;
+//   };
+
+//   this.disabledButton = () => {
+//     if (this.getLogin().length < 1 || inputPass.getValue().length < 1) {
+//       submitButton.disabled = true;
+//     } else {
+//       submitButton.disabled = false;
+//     }
+//   };
+//   this.disabledButton();
+// }
+
+// const container = document.getElementById("loginForm");
+// const formnew = new LoginForm(container, false);
+
+
+
+//Password Verify
+
+// const passwordContainer = document.getElementById("password-container");
+
+// const password1 = new Password(passwordContainer, false);
+// const password2 = new Password(passwordContainer, false);
+
+// password1.onChange = (value) => {
+//   if (value !== password2.getValue()) {
+//     password2.setStyle("2px solid red");
+//   } else {
+//     password2.setStyle("");
+//   }
+// };
+
+// password1.onOpenChange = (open) => {
+//   if (open) {
+//     if (password2.getOpen() === true) {
+//       password2.setOpen(false);
+//     }
+//   } else {
+//     if (password2.getOpen() === false) {
+//       password2.setOpen(true);
+//     }
+//   }
+// };
+
+// password2.onChange = (value) => {
+//   if (value !== password1.getValue()) {
+//     password2.setStyle("2px solid red");
+//   } else {
+//     password2.setStyle("");
+//   }
+// };
+
+// password2.onOpenChange = (open) => {
+//   if (open) {
+//     if (password1.getOpen() === true) {
+//       password1.setOpen(false);
+//     }
+//   } else {
+//     if (password1.getOpen() === false) {
+//       password1.setOpen(true);
+//     }
+//   }
+// };
