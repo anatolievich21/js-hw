@@ -65,6 +65,7 @@ const func2 = (DOM, data) => {
                     .then(res => res.json())
                     .then(newData => {
                         func2(td, newData);
+                        button.disabled = true;
                     });
             });
             td.appendChild(button);
@@ -148,6 +149,115 @@ const func2 = (DOM, data) => {
 
 
 //Promisify: LoginForm
+
+////Password
+
+function Password(parent, open){
+    const inputPassword = document.createElement('input');
+    inputPassword.type = 'password';
+    inputPassword.placeholder = 'password';
+    inputPassword.oninput = () => this.setValue(inputPassword.value);
+    inputPassword.style.cssText = `
+        display: block;
+        max-width: 300px;
+    `;
+    parent.appendChild(inputPassword);
+
+    const checkVisible = document.createElement('input');
+    checkVisible.type = 'checkbox';
+    checkVisible.oninput = () => this.setOpen(checkVisible.checked);
+    checkVisible.style.cssText = `
+        display: block;
+        max-width: 300px;
+    `;
+    parent.appendChild(checkVisible);
+
+    this.getValue = () => inputPassword.value;
+
+    this.setValue = (newValue) => {
+        inputPassword.value = newValue;
+
+        if (typeof this.onChange === 'function') {
+            this.onChange(inputPassword.value);
+        }
+    };
+
+    this.getOpen = () => open;
+
+    this.setOpen = (newOpen) => {
+        open = newOpen;
+
+        if (open) {
+            inputPassword.type = 'text';
+            checkVisible.checked = true;
+        } else {
+            inputPassword.type = 'password';
+            checkVisible.checked = false;
+        }
+
+        if (typeof this.onOpenChange === 'function') {
+            this.onOpenChange(open);
+        }
+    };
+
+    this.setStyle = (newStyle) => {
+        inputPassword.style.border = newStyle;
+    };
+
+    this.setOpen(open);
+    this.setStyle('2px solid grey');
+}
+
+////LoginForm
+function LoginForm(parent) {
+    return new Promise((resolve, reject) => {
+        const form = document.createElement('form');
+        form.style.display = 'flex';
+        form.style.flexDirection = 'column';
+        parent.appendChild(form);
+
+        const usernameInput = document.createElement('input');
+        usernameInput.type = 'text';
+        usernameInput.placeholder = 'username';
+        usernameInput.style.cssText = `
+      display: block;
+      max-width: 300px;
+      border: 2px solid grey;
+    `;
+        form.appendChild(usernameInput);
+
+        const password = new Password(form, false);
+
+        const submitButton = document.createElement('button');
+        submitButton.type = 'submit';
+        submitButton.disabled = true;
+        submitButton.style.cssText = `
+      display: block;
+      max-width: 300px;
+      border: 2px solid grey;
+    `;
+        submitButton.textContent = 'Log In';
+        form.appendChild(submitButton);
+
+        const validateForm = () => {
+            submitButton.disabled = usernameInput.value === '' || password.getValue() === '';
+        };
+
+        usernameInput.oninput = validateForm;
+        password.onChange = validateForm;
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            resolve({ login: usernameInput.value, password: password.getValue() });
+        };
+    });
+}
+
+const loginFormPromise = LoginForm(document.body);
+
+loginFormPromise.then(({ login, password }) =>
+    console.log(`Ви ввели ${login} та ${password}`)
+);
 
 
 
