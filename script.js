@@ -1,42 +1,39 @@
 //Chat
 
-function jsonPost(url, data)
-{
-    return new Promise((resolve, reject) => {
-        var x = new XMLHttpRequest();
-        x.onerror = () => reject(new Error('jsonPost failed'))
-        //x.setRequestHeader('Content-Type', 'application/json');
-        x.open("POST", url, true);
-        x.send(JSON.stringify(data))
-
-        x.onreadystatechange = () => {
-            if (x.readyState == XMLHttpRequest.DONE && x.status == 200){
-                resolve(JSON.parse(x.responseText))
-            }
-            else if (x.status != 200){
-                reject(new Error('status is not 200'))
-            }
-        }
-    })
-}
+// function jsonPost(url, data)
+// {
+//     return new Promise((resolve, reject) => {
+//         var x = new XMLHttpRequest();
+//         x.onerror = () => reject(new Error('jsonPost failed'))
+//         //x.setRequestHeader('Content-Type', 'application/json');
+//         x.open("POST", url, true);
+//         x.send(JSON.stringify(data))
+//
+//         x.onreadystatechange = () => {
+//             if (x.readyState == XMLHttpRequest.DONE && x.status == 200){
+//                 resolve(JSON.parse(x.responseText))
+//             }
+//             else if (x.status != 200){
+//                 reject(new Error('status is not 200'))
+//             }
+//         }
+//     })
+// }
 
 //Stage 6
 
-// function jsonPost(url, data) {
-//     return fetch(url, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify(data),
-//     })
-//         .then(res => {
-//             if (!res.ok){
-//                 throw new Error(`jsonPost problem. Status: ${res.status}`)
-//             }
-//             return res.json()
-//         })
-// }
+function jsonPost(url, data) {
+    return fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+    })
+        .then(res => {
+            if (!res.ok){
+                throw new Error(`jsonPost problem. Status: ${res.status}`)
+            }
+            return res.json()
+        })
+}
 
 
 ////Stage 0
