@@ -1,133 +1,221 @@
-//redux Homework
+//Chat
 
-const defaultState =  {
-    beer: {
-        quantity: 300,
-        price: 60,
-    },
-    chips: {
-        quantity: 500,
-        price: 50,
-    },
-    cigi: {
-        quantity: 100,
-        price: 100,
-    },
+function jsonPost(url, data)
+{
+    return new Promise((resolve, reject) => {
+        var x = new XMLHttpRequest();
+        x.onerror = () => reject(new Error('jsonPost failed'))
+        //x.setRequestHeader('Content-Type', 'application/json');
+        x.open("POST", url, true);
+        x.send(JSON.stringify(data))
 
-    casa: 0,
+        x.onreadystatechange = () => {
+            if (x.readyState == XMLHttpRequest.DONE && x.status == 200){
+                resolve(JSON.parse(x.responseText))
+            }
+            else if (x.status != 200){
+                reject(new Error('status is not 200'))
+            }
+        }
+    })
+}
+
+//Stage 6
+
+// function jsonPost(url, data) {
+//     return fetch(url, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify(data),
+//     })
+//         .then(res => {
+//             if (!res.ok){
+//                 throw new Error(`jsonPost problem. Status: ${res.status}`)
+//             }
+//             return res.json()
+//         })
+// }
+
+
+////Stage 0
+
+// const funcStage0 = async () => {
+//     const res = await jsonPost("http://students.a-level.com.ua:10012",
+//         { func: 'addMessage', nick: "Vlad", message: 'Hello world!' });
+//     console.log(res)
+// }
+//
+// funcStage0();
+
+
+
+//Stage 1
+
+// const messageInput = document.createElement('input');
+// const nickInput = document.createElement('input');
+// const sendButton = document.createElement('button');
+//
+// sendButton.innerText = 'Відправити';
+//
+// sendButton.addEventListener('click', async () => {
+//     const res = await jsonPost("http://students.a-level.com.ua:10012", {
+//         func: 'addMessage',
+//         nick: nickInput.value,
+//         message: messageInput.value,
+//     });
+//
+//     const nextMessageId = res.nextMessageId;
+//
+//     messageInput.value = '';
+//
+//     console.log(res);
+//     // console.log(nextMessageId);
+// });
+//
+// document.body.appendChild(nickInput);
+// document.body.appendChild(messageInput);
+// document.body.appendChild(sendButton);
+
+
+
+////Stage 2-4
+// const container = document.createElement('div')
+//
+// let nextMessageId = 0; //Stage 3
+//
+// const showMessages = async () => {
+//     ;
+//
+//     const res = await jsonPost('http://students.a-level.com.ua:10012', {
+//         func: 'getMessages',
+//         messageId: nextMessageId,
+//     });
+//
+//     const messages = res.data.reverse();
+//
+//     nextMessageId = res.nextMessageId;//Stage 3
+//
+//     if(nextMessageId > 0){
+//         container.innerHTML = '';
+//     }
+//
+//     messages.forEach(message => {
+//         const messageDiv = document.createElement('div');
+//         const nickSpan = document.createElement('span');
+//         const timeSpan = document.createElement('span');
+//         const messageTextDiv = document.createElement('div');
+//
+//         nickSpan.innerText = `${message.nick}: `;
+//         timeSpan.innerText = new Date(message.timestamp).toLocaleTimeString();
+//         messageTextDiv.innerText = message.message;
+//
+//         nickSpan.style.cssText = `
+//             color: purple;
+//         `;
+//
+//         messageDiv.appendChild(nickSpan);
+//         messageDiv.appendChild(timeSpan);
+//         messageDiv.appendChild(messageTextDiv);
+//
+//         container.appendChild(messageDiv);
+//     })
+//
+//
+// }
+// document.body.appendChild(container);
+// showMessages();
+//
+// setInterval(showMessages, 5000);//Stage 4
+
+
+
+//Stage 5
+
+const messageInput = document.createElement('input');
+const nickInput = document.createElement('input');
+const sendButton = document.createElement('button');
+const container = document.createElement('div')
+const checkbox = document.createElement('input');
+
+sendButton.innerText = 'Відправити';
+checkbox.type = 'checkbox';
+
+let nextMessageId = 0;
+
+const sendMessage = async (nick, message) => {
+    const res = await jsonPost("http://students.a-level.com.ua:10012", {
+        func: 'addMessage',
+        nick: nick,
+        message: message,
+    });
+
+    return res;
 };
 
-const BUY = 'buy';
+const getMessages = async () => {
+    const res = await jsonPost('http://students.a-level.com.ua:10012', {
+        func: 'getMessages',
+        messageId: nextMessageId,
+    });
 
-function reducer(state = defaultState, {type, what, amount, money}){
+    const messages = res.data.reverse();
 
-    if (type === BUY){
-        const info = document.getElementById('info');
+    nextMessageId = res.nextMessageId;
 
-        const quantity = state[what].quantity;
-        const price = state[what].price;
-
-        if (amount > quantity) {
-            info.innerHTML = `Вибачте, у нас недостатньо товару`;
-            return state;
-        } else if (money < amount * price) {
-            info.innerHTML = `Недостатньо коштів!`;
-            return state;
-        } else if (!quantity) {
-            info.innerHTML = `Вибачте, товар тимчасово відсутній`;
-            return state;
-        } else if (money >= amount * price){
-            const total = amount * state[what].price;
-            info.innerHTML = `Ви придбали ${amount} ${what} за ${total} грн. Ваша здача: ${money - total} грн`;
-
-            money = amount * state[what].price;
-            return {
-                ...state,
-                [what]: { quantity: quantity - amount, price: price },
-                casa: state.casa + money,
-            }
-        } else {
-            return state
-        }
+    if (nextMessageId > 0) {
+        container.innerHTML = '';
     }
 
-    return state
-}
+    messages.forEach((message) => {
+        const messageDiv = document.createElement('div');
+        const nickSpan = document.createElement('span');
+        const timeSpan = document.createElement('span');
+        const messageTextDiv = document.createElement('div');
 
-function createStore(reducer) {
-    let state = reducer(undefined, {});
-    let cbs = [];
+        nickSpan.innerText = `${message.nick}: `;
+        timeSpan.innerText = new Date(message.timestamp).toLocaleTimeString();
+        messageTextDiv.innerText = message.message;
 
-    const getState = () => state;
-    const subscribe = (cb) => {
-        cbs.push(cb);
-        return () => (cbs) = cbs.filter((c) => c !== cb);
-    };
+        nickSpan.style.cssText = `
+      color: purple;
+    `;
 
-    const dispatch = (action) => {
-        const newState = reducer(state, action);
-        if (newState !== state) {
-            state = newState;
-            for (let cb of cbs) cb();
-        }
-    };
+        messageDiv.appendChild(nickSpan);
+        messageDiv.appendChild(timeSpan);
+        messageDiv.appendChild(messageTextDiv);
 
-    return {
-        getState,
-        dispatch,
-        subscribe,
-    };
-}
-
-const quantityOfGoods = document.getElementById('quantityOfGoods');
-const moneyInput = document.getElementById('money');
-const info = document.getElementById('info');
-const goodsSelect = document.getElementById('goods');
-const beerQuantity = document.getElementById('beerQuantity');
-const chipsQuantity = document.getElementById('chipsQuantity');
-const cigiQuantity = document.getElementById('cigiQuantity');
-const beerPrice = document.getElementById('beerPrice');
-const chipsPrice = document.getElementById('chipsPrice');
-const cigiPrice = document.getElementById('cigiPrice');
-const cash = document.getElementById('cash');
-
-const store = createStore(reducer);
-
-function update() {
-    beerQuantity.textContent = store.getState().beer.quantity;
-    chipsQuantity.textContent = store.getState().chips.quantity;
-    cigiQuantity.textContent = store.getState().cigi.quantity;
-    beerPrice.textContent = store.getState().beer.price;
-    chipsPrice.textContent = store.getState().chips.price;
-    cigiPrice.textContent = store.getState().cigi.price;
-    cash.textContent = store.getState().casa;
-    document.title = `Kaса: ${cash.textContent}`;
-}
-
-store.subscribe(update);
-
-document.getElementById('buy').addEventListener('click', () => {
-    const selectedGoods = goodsSelect.value;
-    const amount = Number(quantityOfGoods.value);
-    const money = Number(moneyInput.value);
-    store.dispatch({ type: 'buy', what: selectedGoods, amount, money });
-
-    quantityOfGoods.value = '';
-    moneyInput.value = '';
-
-    let timerId = setTimeout(() => {
-        info.innerHTML = '';
-    }, 3000);
-
-    document.getElementById('buy').addEventListener('click', () => {
-        clearTimeout(timerId);
+        container.appendChild(messageDiv);
     });
+};
+
+const sendAndCheck = async () => {
+    await sendMessage(nickInput.value, messageInput.value);
+    await getMessages();
+    messageInput.value = '';
+};
+
+const delay = (ms) => {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+const checkLoop = async () => {
+    if (true){
+        await getMessages();
+        await delay(5000);
+    }
+};
+
+checkbox.addEventListener('change', async () => {
+    if (checkbox.checked) {
+        await checkLoop();
+    }
 });
+sendButton.addEventListener('click', sendAndCheck);
 
-update();
-goodsSelect.innerHTML = `
-    <option value="beer">Пиво</option>
-    <option value="chips">Чіпси</option>
-    <option value="cigi">Цигарки</option>
-`;
-
+document.body.appendChild(nickInput);
+document.body.appendChild(messageInput);
+document.body.appendChild(sendButton);
+document.body.appendChild(checkbox);
+document.body.appendChild(container);
