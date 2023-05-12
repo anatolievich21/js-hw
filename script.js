@@ -161,7 +161,7 @@ const getMessages = async () => {
 
     nextMessageId = res.nextMessageId;
 
-    if (nextMessageId > 0) {
+    if (nextMessageId > 0 && checkbox.checked) {
         container.innerHTML = '';
     }
 
