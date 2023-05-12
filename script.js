@@ -1,50 +1,57 @@
 //redux Homework
 
-function reducer(state, {type, what, amount, money}){
-    if (!state){
-        return {
-            beer: {
-                quantity: 300,
-                price: 60,
-            },
-            chips: {
-                quantity: 500,
-                price: 50,
-            },
-            cigi: {
-                quantity: 100,
-                price: 100,
-            },
+const defaultState =  {
+    beer: {
+        quantity: 300,
+        price: 60,
+    },
+    chips: {
+        quantity: 500,
+        price: 50,
+    },
+    cigi: {
+        quantity: 100,
+        price: 100,
+    },
 
-            casa: 0,
-        }
-    }
+    casa: 0,
+};
 
-    if (type === 'buy'){
-        if (amount > state[what].quantity) {
-            document.getElementById('info').innerHTML = `Вибачте, у нас недостатньо товару`;
+const BUY = 'buy';
+
+function reducer(state = defaultState, {type, what, amount, money}){
+
+    if (type === BUY){
+        const info = document.getElementById('info');
+
+        const quantity = state[what].quantity;
+        const price = state[what].price;
+
+        if (amount > quantity) {
+            info.innerHTML = `Вибачте, у нас недостатньо товару`;
             return state;
-        } else if (money < amount * state[what].price) {
-            document.getElementById('info').innerHTML = `Недостатньо коштів!`;
+        } else if (money < amount * price) {
+            info.innerHTML = `Недостатньо коштів!`;
             return state;
-        } else if (!state[what].quantity) {
-            document.getElementById('info').innerHTML = `Вибачте, товар тимчасово відсутній`;
+        } else if (!quantity) {
+            info.innerHTML = `Вибачте, товар тимчасово відсутній`;
             return state;
-        } else if (money >= amount * state[what].price){
+        } else if (money >= amount * price){
             const total = amount * state[what].price;
-            document.getElementById('info').innerHTML = `Ви придбали ${amount} ${what} за ${total} грн. Ваша здача: ${money - total} грн`;
-
+            info.innerHTML = `Ви придбали ${amount} ${what} за ${total} грн. Ваша здача: ${money - total} грн`;
 
             money = amount * state[what].price;
             return {
                 ...state,
-                [what]: { quantity: state[what].quantity - amount, price: state[what].price },
+                [what]: { quantity: quantity - amount, price: price },
                 casa: state.casa + money,
             }
         } else {
             return state
         }
     }
+
+    return state
 }
 
 function createStore(reducer) {
