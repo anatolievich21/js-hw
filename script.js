@@ -22,8 +22,8 @@
 
 //Stage 6
 
-function jsonPost(url, data) {
-    return fetch(url, {
+async function jsonPost(url, data) {
+    return await fetch(url, {
         method: 'POST',
         body: JSON.stringify(data),
     })
@@ -159,7 +159,7 @@ const getMessages = async () => {
 
     const messages = res.data.reverse();
 
-    nextMessageId = res.nextMessageId;
+    nextMessageId = nextMessageId ? nextMessageId : res.nextMessageId - 1;
 
     if (nextMessageId > 0 && checkbox.checked) {
         container.innerHTML = '';
@@ -198,9 +198,9 @@ const delay = (ms) => {
 };
 
 const checkLoop = async () => {
-    if (true){
-        await getMessages();
+    while (true){
         await delay(5000);
+        await getMessages();
     }
 };
 
