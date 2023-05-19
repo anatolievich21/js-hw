@@ -1,218 +1,153 @@
-//Chat
+//TrafficLight
 
-// function jsonPost(url, data)
-// {
-//     return new Promise((resolve, reject) => {
-//         var x = new XMLHttpRequest();
-//         x.onerror = () => reject(new Error('jsonPost failed'))
-//         //x.setRequestHeader('Content-Type', 'application/json');
-//         x.open("POST", url, true);
-//         x.send(JSON.stringify(data))
+const delay = ms => new Promise(ok => setTimeout(ok, ms));
+// const div = document.getElementById('traffic-light');
 //
-//         x.onreadystatechange = () => {
-//             if (x.readyState == XMLHttpRequest.DONE && x.status == 200){
-//                 resolve(JSON.parse(x.responseText))
-//             }
-//             else if (x.status != 200){
-//                 reject(new Error('status is not 200'))
-//             }
-//         }
-//     })
+// async function trafficLight(container = div, redTime = 2000, yellowTime = 1000, greenTime = 3000) {
+//
+//     const redLight = document.createElement("container");
+//     const yellowLight = document.createElement("container");
+//     const greenLight = document.createElement("container");
+//
+//     redLight.className = "light";
+//     yellowLight.className = "light";
+//     greenLight.className = "light";
+//
+//     container.appendChild(redLight);
+//     container.appendChild(yellowLight);
+//     container.appendChild(greenLight);
+//
+//     while (true) {
+//         redLight.style.backgroundColor = "red";
+//         yellowLight.style.backgroundColor = "transparent";
+//         greenLight.style.backgroundColor = "transparent";
+//         await delay(redTime);
+//
+//         redLight.style.backgroundColor = "transparent";
+//         yellowLight.style.backgroundColor = "yellow";
+//         await delay(yellowTime);
+//
+//         yellowLight.style.backgroundColor = "transparent";
+//         greenLight.style.backgroundColor = "green";
+//         await delay(greenTime);
+//     }
 // }
+//
+// trafficLight();
 
-//Stage 6
 
-function jsonPost(url, data) {
-    return fetch(url, {
+
+// //PedestrianTrafficLight
+
+// async function pedestrianLight() {
+//     const div = document.getElementById('pedestrian-light');
+//
+//     const redLight = document.createElement("div");
+//     const greenLight = document.createElement("div");
+//     const button = document.createElement('button');
+//
+//     redLight.className = "light";
+//     greenLight.className = "light";
+//
+//     button.style.cssText = `
+//         width: 20px;
+//         height: 20px;
+//         margin: 0px auto 10px;
+//         border-radius: 50%
+//     `;
+//
+//     div.appendChild(redLight);
+//     div.appendChild(greenLight);
+//     div.appendChild(button);
+//
+//     while (true) {
+//         redLight.style.backgroundColor = "red";
+//         greenLight.style.backgroundColor = "transparent";
+//         await delay(3000);
+//
+//         redLight.style.backgroundColor = "transparent";
+//         greenLight.style.backgroundColor = "green";
+//         await delay(3000);
+//     }
+// }
+//
+// pedestrianLight();
+
+
+
+//speedtest
+
+// async function speedtest(getPromise, count, parallel = 1) {
+//   const start = Date.now();
+//   const promises = [];
+//
+//   for (let i = 0; i < count; i++) {
+//     for (let j = 0; j < parallel; j++) {
+//       promises.push(getPromise());
+//     }
+//
+//     await Promise.all(promises);
+//   }
+//
+//   const end = Date.now();
+//   const duration = end - start;
+//   const queryDuration = duration / count;
+//   const querySpeed = count / duration;
+//   const parallelDuration = duration / (count * parallel);
+//   const parallelSpeed = (count * parallel) / duration;
+//
+//   return {
+//     duration,
+//     querySpeed,
+//     queryDuration,
+//     parallelSpeed,
+//     parallelDuration,
+//   };
+// }
+//
+// speedtest(() => delay(1000), 10, 10 ).then(result => console.log(result))
+// // {duration: 10000,
+// // querySpeed: 0.001, //1 тисячна запита за мілісекунду
+// // queryDuration: 1000, //1000 мілісекунд на один реальний запит у середньому
+// // parallelSpeed: 0.01  // 100 запитів за 10000 мілісекунд
+// // parallelDuration: 100 // 100 запитів за 10000 мілісекунд
+// speedtest(() => fetch('http://swapi.dev/api/people/1').then(res => res.json()), 10, 5).then(result => console.log(result))
+
+
+
+//gql
+
+async function gql (endpoint, query, variables){
+    const request = await fetch(endpoint, {
         method: 'POST',
-        body: JSON.stringify(data),
-    })
-        .then(res => {
-            if (!res.ok){
-                throw new Error(`jsonPost problem. Status: ${res.status}`)
-            }
-            return res.json()
-        })
+        headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        },
+        body: JSON.stringify({
+            query: query,
+            variables: variables,
+        }),
+    });
+
+    return await request.json();
 }
 
 
-////Stage 0
 
-// const funcStage0 = async () => {
-//     const res = await jsonPost("http://students.a-level.com.ua:10012",
-//         { func: 'addMessage', nick: "Vlad", message: 'Hello world!' });
-//     console.log(res)
-// }
-//
-// funcStage0();
+//jwtDecode
 
-
-
-//Stage 1
-
-// const messageInput = document.createElement('input');
-// const nickInput = document.createElement('input');
-// const sendButton = document.createElement('button');
-//
-// sendButton.innerText = 'Відправити';
-//
-// sendButton.addEventListener('click', async () => {
-//     const res = await jsonPost("http://students.a-level.com.ua:10012", {
-//         func: 'addMessage',
-//         nick: nickInput.value,
-//         message: messageInput.value,
-//     });
-//
-//     const nextMessageId = res.nextMessageId;
-//
-//     messageInput.value = '';
-//
-//     console.log(res);
-//     // console.log(nextMessageId);
-// });
-//
-// document.body.appendChild(nickInput);
-// document.body.appendChild(messageInput);
-// document.body.appendChild(sendButton);
-
-
-
-////Stage 2-4
-// const container = document.createElement('div')
-//
-// let nextMessageId = 0; //Stage 3
-//
-// const showMessages = async () => {
-//     ;
-//
-//     const res = await jsonPost('http://students.a-level.com.ua:10012', {
-//         func: 'getMessages',
-//         messageId: nextMessageId,
-//     });
-//
-//     const messages = res.data.reverse();
-//
-//     nextMessageId = res.nextMessageId;//Stage 3
-//
-//     if(nextMessageId > 0){
-//         container.innerHTML = '';
-//     }
-//
-//     messages.forEach(message => {
-//         const messageDiv = document.createElement('div');
-//         const nickSpan = document.createElement('span');
-//         const timeSpan = document.createElement('span');
-//         const messageTextDiv = document.createElement('div');
-//
-//         nickSpan.innerText = `${message.nick}: `;
-//         timeSpan.innerText = new Date(message.timestamp).toLocaleTimeString();
-//         messageTextDiv.innerText = message.message;
-//
-//         nickSpan.style.cssText = `
-//             color: purple;
-//         `;
-//
-//         messageDiv.appendChild(nickSpan);
-//         messageDiv.appendChild(timeSpan);
-//         messageDiv.appendChild(messageTextDiv);
-//
-//         container.appendChild(messageDiv);
-//     })
-//
-//
-// }
-// document.body.appendChild(container);
-// showMessages();
-//
-// setInterval(showMessages, 5000);//Stage 4
-
-
-
-//Stage 5
-
-const messageInput = document.createElement('input');
-const nickInput = document.createElement('input');
-const sendButton = document.createElement('button');
-const container = document.createElement('div')
-const checkbox = document.createElement('input');
-
-sendButton.innerText = 'Відправити';
-checkbox.type = 'checkbox';
-
-let nextMessageId = 0;
-
-const sendMessage = async (nick, message) => {
-    const res = await jsonPost("http://students.a-level.com.ua:10012", {
-        func: 'addMessage',
-        nick: nick,
-        message: message,
-    });
-
-    return res;
-};
-
-const getMessages = async () => {
-    const res = await jsonPost('http://students.a-level.com.ua:10012', {
-        func: 'getMessages',
-        messageId: nextMessageId,
-    });
-
-    const messages = res.data.reverse();
-
-    nextMessageId = res.nextMessageId;
-
-    if (nextMessageId > 0 && checkbox.checked) {
-        container.innerHTML = '';
+async function jwtDecode (token) {
+    try {
+        const arr = token.split('.')
+        const encodedData = arr[1];
+        const decodedData = atob(encodedData);
+        const data = JSON.parse(decodedData);
+        console.log(data)
+        return data;
+    } catch (error){
+        return undefined;
     }
+}
 
-    messages.forEach((message) => {
-        const messageDiv = document.createElement('div');
-        const nickSpan = document.createElement('span');
-        const timeSpan = document.createElement('span');
-        const messageTextDiv = document.createElement('div');
 
-        nickSpan.innerText = `${message.nick}: `;
-        timeSpan.innerText = new Date(message.timestamp).toLocaleTimeString();
-        messageTextDiv.innerText = message.message;
-
-        nickSpan.style.cssText = `
-      color: purple;
-    `;
-
-        messageDiv.appendChild(nickSpan);
-        messageDiv.appendChild(timeSpan);
-        messageDiv.appendChild(messageTextDiv);
-
-        container.appendChild(messageDiv);
-    });
-};
-
-const sendAndCheck = async () => {
-    await sendMessage(nickInput.value, messageInput.value);
-    await getMessages();
-    messageInput.value = '';
-};
-
-const delay = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-};
-
-const checkLoop = async () => {
-    if (true){
-        await getMessages();
-        await delay(5000);
-    }
-};
-
-checkbox.addEventListener('change', async () => {
-    if (checkbox.checked) {
-        await checkLoop();
-    }
-});
-sendButton.addEventListener('click', sendAndCheck);
-
-document.body.appendChild(nickInput);
-document.body.appendChild(messageInput);
-document.body.appendChild(sendButton);
-document.body.appendChild(checkbox);
-document.body.appendChild(container);

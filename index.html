@@ -1,14 +1,37 @@
 <!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <title>HW</title>
-</head>
-<body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <title>HW</title>
+        <style>
+            #traffic-light {
+                display: inline-flex;
+                flex-direction: column;
+                background-color: grey;
+                border: 1px solid black;
+            }
 
-    <script src="script.js"></script>
-</body>
+            #pedestrian-light {
+                display: inline-flex;
+                flex-direction: column;
+                background-color: grey;
+                border: 1px solid black;
+            }
+
+            .light {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                margin: 10px;
+                border: 1px solid black;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="traffic-light"></div>
+        <div id="pedestrian-light"></div>
+        <script src="script.js"></script>
+    </body>
 </html>
