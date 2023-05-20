@@ -1,5 +1,33 @@
-//
-function promiseReducer(state={}, {type, promiseName, status, payload, error}){
+function createStore(reducer){
+    let state       = reducer(undefined, {})
+    let cbs         = []
+
+    const getState  = () => state
+    const subscribe = cb => (cbs.push(cb),
+        () => cbs = cbs.filter(c => c !== cb))
+    const dispatch  = action => {
+        if (typeof action === 'function'){
+            return action(dispatch, getState)
+        }
+        const newState = reducer(state, action)
+        if (newState !== state){
+            state = newState
+            for (let cb of cbs)  cb()
+        }
+    }
+
+    return {
+        getState,
+        dispatch,
+        subscribe
+    }
+}
+
+
+
+//promiseReducer
+
+function promiseReducer(state= {}, {type, promiseName, status, payload, error}){
     if (type === 'PROMISE'){
         return {
             ...state,
@@ -15,58 +43,103 @@ const actionFulfilled = (promiseName, payload) => ({type: 'PROMISE', promiseName
 const actionRejected  = (promiseName, error)   => ({type: 'PROMISE', promiseName, status: 'REJECTED',  error})
 const actionPromise = (promiseName, promise) =>
     async dispatch => {
-        dispatch(actionPending(promiseName)) //сигналізуємо redux, що проміс почався
+        dispatch(actionPending(promiseName))
         try{
-            const payload = await promise //очікуємо промісу
-            dispatch(actionFulfilled(promiseName, payload)) //сигналізуємо redux, що проміс успішно виконано
-            return payload //у місці запуску store.dispatch з цим thunk можна також отримати результат промісу
+            const payload = await promise
+            dispatch(actionFulfilled(promiseName, payload))
+            return payload
         }
         catch (error){
-            dispatch(actionRejected(promiseName, error)) //у разі помилки - сигналізуємо redux, що проміс не склався
+            dispatch(actionRejected(promiseName, error))
         }
     }
 
-function createStore(reducer){
-    let state       = reducer(undefined, {}) //стартова ініціалізація стану, запуск редьюсера зі state === undefined
-    let cbs         = []                     //масив передплатників
+// const store = createStore(promiseReducer)
+//
+// store.subscribe(() => console.log(store.getState())) //має запускатися 6 разів
+//
+// const delay = (ms) => new Promise((ok) => setTimeout(ok, ms));
+//
+// store.dispatch(actionPromise('delay', delay(1000)))
+// store.dispatch(actionPromise('luke', fetch("https://swapi.dev/api/people/1").then(res => res.json())))
+// store.dispatch(actionPromise('tatooine', fetch("https://swapi.dev/api/planets/1").then(res => res.json())))
 
-    const getState  = () => state            //функція, що повертає змінну із замикання
-    const subscribe = cb => (cbs.push(cb),   //запам'ятовуємо передплатників у масиві
-        () => cbs = cbs.filter(c => c !== cb)) //повертаємо функцію unsubscribe, яка видаляє передплатника зі списку
 
-    const dispatch  = action => {
-        if (typeof action === 'function'){ //якщо action – не об'єкт, а функція
-            return action(dispatch, getState) //запускаємо цю функцію і даємо їй dispatch і getState для роботи
-        }
-        const newState = reducer(state, action) //пробуємо запустити редьюсер
-        if (newState !== state){ //перевіряємо, чи зміг ред'юсер обробити action
-            state = newState //якщо зміг, то оновлюємо state
-            for (let cb of cbs)  cb() //та запускаємо передплатників
-        }
-    }
 
-    return {
-        getState, //додавання функції getState в результуючий об'єкт
-        dispatch,
-        subscribe //додавання subscribe в об'єкт
+//authReducer
+
+async function jwtDecode (token) {
+    try {
+        const arr = token.split('.')
+        const encodedData = arr[1];
+        const decodedData = atob(encodedData);
+        return await JSON.parse(decodedData);
+
+    } catch (error){
+        return undefined;
     }
 }
 
-const store = createStore(promiseReducer)
+function authReducer (state = {}, {type, token}) {
+    if (type === 'AUTH_LOGIN'){
+        if (token){
+            const decodedData = jwtDecode(token);
 
-store.subscribe(() => console.log(store.getState())) //має запускатися 6 разів
+            if (decodedData){
+                return {
+                    token,
+                    payload: decodedData,
+                }
+            }
+        }
 
-const delay = (ms) => new Promise((ok) => setTimeout(ok, ms));
+        return {};
+    }
+    if (type === 'AUTH_LOGOUT'){
+        return {};
+    }
 
-store.dispatch(actionPromise('delay', delay(1000)))
-store.dispatch(actionPromise('luke', fetch("https://swapi.dev/api/people/1").then(res => res.json())))
-store.dispatch(actionPromise('tatooine', fetch("https://swapi.dev/api/planets/1").then(res => res.json())))
-
-//за підсумком повинен вийти якийсь такий state:
-/*
-{
-     delay: {status: 'FULFILLED', payload: 1000, error: undefined},
-     luke: {status: 'FULFILLED', payload: { ..... тралівали про люка}, error: undefined},
-     tatooine: {status: 'FULFILLED', payload: { ..... тралювали про планету татуїн}, error: undefined},
+    return state
 }
-*/
+
+
+
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
+
+const store = createStore(authReducer)
+store.subscribe(() => console.log(store.getState()))
+
+store.dispatch(actionAuthLogin(token))
+/*{
+    token: "eyJhbGc.....",
+    payload: {
+      "sub": {
+        "id": "6377e133b74e1f5f2ec1c125",
+        "login": "test5",
+        "acl": [
+          "6377e133b74e1f5f2ec1c125",
+          "user"
+        ]
+      },
+      "iat": 1668812458
+    }
+}*/
+store.dispatch(actionAuthLogout()) // {}
+
+const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
+const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
+
+
+
+//cartReducer
+
+
+
+
+
+
+
+
+
+
+
