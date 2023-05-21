@@ -105,7 +105,7 @@ function authReducer (state = {}, {type, token}) {
 
 
 
-// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
+const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
 //
 // const store = createStore(authReducer)
 // store.subscribe(() => console.log(store.getState()))
@@ -139,11 +139,11 @@ function cartReducer(state, {type, count, good}) {
     if (type === 'CART_ADD') {
         const {_id} = good;
 
-        if (state[_id]) {
+        if (state && state[_id]) {
 
             return {
                 ...state,
-                [_id]: {...state, good,count: state[_id].count + count},
+                [_id]: {...state[_id], count: state[_id].count + count},
             }
         }
 
@@ -224,34 +224,34 @@ store.subscribe(() => console.log(store.getState())) //
 
 console.log(store.getState()) //{}
 
-store.dispatch(actionCartAdd({_id: 'beer', price: 50}))
+store.dispatch(actionCartAdd({_id: 'пиво', price: 50}))
 // {пиво: {good: {_id: 'пиво', price: 50}, count: 1}}
-// store.dispatch(actionCartAdd({_id: 'чіпси', price: 75}))
-// // {
-// // пиво: {good: {_id: 'пиво', price: 50}, count: 1},
-// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
-// //}
-// store.dispatch(actionCartAdd({_id: 'пиво', price: 50}, 5))
-// // {
-// // пиво: {good: {_id: 'пиво', price: 50}, count: 6},
-// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
-// //}
-// store.dispatch(actionCartSet({_id: 'чіпси', price: 75}, 2))
-// // {
-// // пиво: {good: {_id: 'пиво', price: 50}, count: 6},
-// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
-// //}
-//
-// store.dispatch(actionCartSub({_id: 'пиво', price: 50}, 4))
-// // {
-// // пиво: {good: {_id: 'пиво', price: 50}, count: 2},
-// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
-// //}
-//
-// store.dispatch(actionCartDel({_id: 'чіпси', price: 75}))
-// // {
-// // пиво: {good: {_id: 'пиво', price: 50}, count: 2},
-// //}
+store.dispatch(actionCartAdd({_id: 'чіпси', price: 75}))
+// {
+// пиво: {good: {_id: 'пиво', price: 50}, count: 1},
+// чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
+//}
+store.dispatch(actionCartAdd({_id: 'пиво', price: 50}, 5))
+// {
+// пиво: {good: {_id: 'пиво', price: 50}, count: 6},
+// чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
+//}
+store.dispatch(actionCartSet({_id: 'чіпси', price: 75}, 2))
+// {
+// пиво: {good: {_id: 'пиво', price: 50}, count: 6},
+// чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
+//}
+
+store.dispatch(actionCartSub({_id: 'пиво', price: 50}, 4))
+// {
+// пиво: {good: {_id: 'пиво', price: 50}, count: 2},
+// чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
+//}
+
+store.dispatch(actionCartDel({_id: 'чіпси', price: 75}))
+// {
+// пиво: {good: {_id: 'пиво', price: 50}, count: 2},
+//}
 
 store.dispatch(actionCartClear()) // {}
 
