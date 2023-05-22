@@ -68,12 +68,12 @@ const actionPromise = (promiseName, promise) =>
 
 //authReducer
 
-async function jwtDecode (token) {
+function jwtDecode (token) {
     try {
         const arr = token.split('.')
         const encodedData = arr[1];
         const decodedData = atob(encodedData);
-        return await JSON.parse(decodedData);
+        return JSON.parse(decodedData);
 
     } catch (error){
         return undefined;
@@ -103,43 +103,42 @@ function authReducer (state = {}, {type, token}) {
     return state
 }
 
+const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
+const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
 
 
 const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
-//
-// const store = createStore(authReducer)
-// store.subscribe(() => console.log(store.getState()))
-//
-// store.dispatch(actionAuthLogin(token))
-// /*{
-//     token: "eyJhbGc.....",
-//     payload: {
-//       "sub": {
-//         "id": "6377e133b74e1f5f2ec1c125",
-//         "login": "test5",
-//         "acl": [
-//           "6377e133b74e1f5f2ec1c125",
-//           "user"
-//         ]
-//       },
-//       "iat": 1668812458
-//     }
-// }*/
-// store.dispatch(actionAuthLogout()) // {}
-//
-// const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
-// const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
+
+const store = createStore(authReducer)
+store.subscribe(() => console.log(store.getState()))
+
+store.dispatch(actionAuthLogin(token))
+/*{
+    token: "eyJhbGc.....",
+    payload: {
+      "sub": {
+        "id": "6377e133b74e1f5f2ec1c125",
+        "login": "test5",
+        "acl": [
+          "6377e133b74e1f5f2ec1c125",
+          "user"
+        ]
+      },
+      "iat": 1668812458
+    }
+}*/
+store.dispatch(actionAuthLogout()) // {}
 
 
 
 //cartReducer
 
-function cartReducer(state, {type, count, good}) {
+function cartReducer(state = {}, {type, count, good}) {
 
     if (type === 'CART_ADD') {
         const {_id} = good;
 
-        if (state && state[_id]) {
+        if (state[_id]) {
 
             return {
                 ...state,
@@ -218,42 +217,42 @@ const actionCartSet = (good, count=1) => ({type: 'CART_SET', count, good})
 const actionCartClear = () => ({type: 'CART_CLEAR'})
 
 
-const store = createStore(cartReducer)
-
-store.subscribe(() => console.log(store.getState())) //
-
-console.log(store.getState()) //{}
-
-store.dispatch(actionCartAdd({_id: 'пиво', price: 50}))
-// {пиво: {good: {_id: 'пиво', price: 50}, count: 1}}
-store.dispatch(actionCartAdd({_id: 'чіпси', price: 75}))
-// {
-// пиво: {good: {_id: 'пиво', price: 50}, count: 1},
-// чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
-//}
-store.dispatch(actionCartAdd({_id: 'пиво', price: 50}, 5))
-// {
-// пиво: {good: {_id: 'пиво', price: 50}, count: 6},
-// чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
-//}
-store.dispatch(actionCartSet({_id: 'чіпси', price: 75}, 2))
-// {
-// пиво: {good: {_id: 'пиво', price: 50}, count: 6},
-// чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
-//}
-
-store.dispatch(actionCartSub({_id: 'пиво', price: 50}, 4))
-// {
-// пиво: {good: {_id: 'пиво', price: 50}, count: 2},
-// чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
-//}
-
-store.dispatch(actionCartDel({_id: 'чіпси', price: 75}))
-// {
-// пиво: {good: {_id: 'пиво', price: 50}, count: 2},
-//}
-
-store.dispatch(actionCartClear()) // {}
+// const store = createStore(cartReducer)
+//
+// store.subscribe(() => console.log(store.getState())) //
+//
+// console.log(store.getState()) //{}
+//
+// store.dispatch(actionCartAdd({_id: 'пиво', price: 50}))
+// // {пиво: {good: {_id: 'пиво', price: 50}, count: 1}}
+// store.dispatch(actionCartAdd({_id: 'чіпси', price: 75}))
+// // {
+// // пиво: {good: {_id: 'пиво', price: 50}, count: 1},
+// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
+// //}
+// store.dispatch(actionCartAdd({_id: 'пиво', price: 50}, 5))
+// // {
+// // пиво: {good: {_id: 'пиво', price: 50}, count: 6},
+// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 1},
+// //}
+// store.dispatch(actionCartSet({_id: 'чіпси', price: 75}, 2))
+// // {
+// // пиво: {good: {_id: 'пиво', price: 50}, count: 6},
+// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
+// //}
+//
+// store.dispatch(actionCartSub({_id: 'пиво', price: 50}, 4))
+// // {
+// // пиво: {good: {_id: 'пиво', price: 50}, count: 2},
+// // чіпси: {good: {_id: 'чіпси', price: 75}, count: 2},
+// //}
+//
+// store.dispatch(actionCartDel({_id: 'чіпси', price: 75}))
+// // {
+// // пиво: {good: {_id: 'пиво', price: 50}, count: 2},
+// //}
+//
+// store.dispatch(actionCartClear()) // {}
 
 
 
