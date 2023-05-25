@@ -55,7 +55,7 @@ const actionPromise = (promiseName, promise) =>
     }
 
 // const store = createStore(promiseReducer)
-//
+
 // store.subscribe(() => console.log(store.getState())) //має запускатися 6 разів
 //
 // const delay = (ms) => new Promise((ok) => setTimeout(ok, ms));
@@ -107,27 +107,27 @@ const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
 const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
 
 
-const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
-
-const store = createStore(authReducer)
-store.subscribe(() => console.log(store.getState()))
-
-store.dispatch(actionAuthLogin(token))
-/*{
-    token: "eyJhbGc.....",
-    payload: {
-      "sub": {
-        "id": "6377e133b74e1f5f2ec1c125",
-        "login": "test5",
-        "acl": [
-          "6377e133b74e1f5f2ec1c125",
-          "user"
-        ]
-      },
-      "iat": 1668812458
-    }
-}*/
-store.dispatch(actionAuthLogout()) // {}
+// const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsiaWQiOiI2Mzc3ZTEzM2I3NGUxZjVmMmVjMWMxMjUiLCJsb2dpbiI6InRlc3Q1IiwiYWNsIjpbIjYzNzdlMTMzYjc0ZTFmNWYyZWMxYzEyNSIsInVzZXIiXX0sImlhdCI6MTY2ODgxMjQ1OH0.t1eQlRwkcP7v9JxUPMo3dcGKprH-uy8ujukNI7xE3A0"
+//
+// const store = createStore(authReducer)
+// store.subscribe(() => console.log(store.getState()))
+//
+// store.dispatch(actionAuthLogin(token))
+// /*{
+//     token: "eyJhbGc.....",
+//     payload: {
+//       "sub": {
+//         "id": "6377e133b74e1f5f2ec1c125",
+//         "login": "test5",
+//         "acl": [
+//           "6377e133b74e1f5f2ec1c125",
+//           "user"
+//         ]
+//       },
+//       "iat": 1668812458
+//     }
+// }*/
+// store.dispatch(actionAuthLogout()) // {}
 
 
 
@@ -256,7 +256,68 @@ const actionCartClear = () => ({type: 'CART_CLEAR'})
 
 
 
+//GraphQL requests
+
+shopURL = 'http://shop-roles.node.ed.asmer.org.ua/graphql';
+
+function getGQL (url = shopURL) {
+    return async function gql (query, variables = {}){
+        const request = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+            },
+            body: JSON.stringify({
+                query: query,
+                variables: variables,
+            }),
+        });
+
+        const data = await request.json();
+
+        if (data.errors) {
+            throw new Error(JSON.stringify(data.errors))
+        }
+
+        return data
+    }
+}
+
+gql = getGQL();
+
+
+//Запит на перелiк кореневих категорій
+const gqlRootCats = () =>
+    gql(`query categories{
+    CategoryFind(query:"[{\\"parent\\": null}]"){
+        _id name
+    }
+}`)
+
+const actionRootCats = () =>
+    actionPromise('rootCats', gqlRootCats())
+
+//Запит для отримання однієї категорії з товарами та картинками
+
+const gqlCatOne = () =>
+    gql(`query oneCatWithGoodsImgs ($id: String){
+    CategoryFindOne([{_id}]: $id){
+    name 
+    goods {
+      name images {
+        url
+      }
+    } 
+  }
+} `)
 
 
 
+
+
+const store = createStore(promiseReducer)
+store.subscribe(() => console.log(store.getState())) //має запускатися 6 разів
+
+store.dispatch(actionRootCats());
 
