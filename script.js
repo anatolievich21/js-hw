@@ -24,9 +24,9 @@ function createStore(reducer){
 }
 
 
-
+////////////////
 //promiseReducer
-
+////////////////
 function promiseReducer(state= {}, {type, promiseName, status, payload, error}){
     if (type === 'PROMISE'){
         return {
@@ -65,9 +65,9 @@ const actionPromise = (promiseName, promise) =>
 // store.dispatch(actionPromise('tatooine', fetch("https://swapi.dev/api/planets/1").then(res => res.json())))
 
 
-
+////////////////
 //authReducer
-
+////////////////
 function jwtDecode (token) {
     try {
         const arr = token.split('.')
@@ -84,6 +84,8 @@ function authReducer (state = {}, {type, token}) {
     if (type === 'AUTH_LOGIN'){
         if (token){
             const decodedData = jwtDecode(token);
+
+            localStorage.authToken = token;
 
             if (decodedData){
                 return {
@@ -130,9 +132,9 @@ const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
 // store.dispatch(actionAuthLogout()) // {}
 
 
-
+////////////////
 //cartReducer
-
+////////////////
 function cartReducer(state = {}, {type, count, good}) {
 
     if (type === 'CART_ADD') {
@@ -255,19 +257,48 @@ const actionCartClear = () => ({type: 'CART_CLEAR'})
 // store.dispatch(actionCartClear()) // {}
 
 
+////////////////
+//localStoredReducer
+////////////////
+function localStoredReducer(originalReducer, localStorageKey) {
+    let isFirstRun = true;
 
+    return function wrapper(state, action) {
+        if (isFirstRun) {
+            isFirstRun = false;
+            const storedState = JSON.parse(localStorage.getItem(localStorageKey));
+
+            if (storedState) {
+                return storedState;
+            }
+        }
+
+        const newState = originalReducer(state, action);
+        localStorage.setItem(localStorageKey, JSON.stringify(newState));
+        return newState;
+    };
+}
+
+
+////////////////
 //GraphQL requests
-
+////////////////
 shopURL = 'http://shop-roles.node.ed.asmer.org.ua/graphql';
 
 function getGQL (url = shopURL) {
     return async function gql (query, variables = {}){
+        const headers = {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+        }
+
+        if (localStorage.authToken) {
+            headers.Authorization = "Bearer " + localStorage.authToken;
+        }
+
         const request = await fetch(url, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-            },
+            headers: headers,
             body: JSON.stringify({
                 query: query,
                 variables: variables,
@@ -280,44 +311,151 @@ function getGQL (url = shopURL) {
             throw new Error(JSON.stringify(data.errors))
         }
 
-        return data
+        return Object.values(data)[0];
     }
 }
 
 gql = getGQL();
 
 
+////////////////
 //Запит на перелiк кореневих категорій
+////////////////
 const gqlRootCats = () =>
-    gql(`query categories{
-    CategoryFind(query:"[{\\"parent\\": null}]"){
+    gql(`query rootCats ($q: String){
+    CategoryFind(query: $q){
         _id name
     }
-}`)
+}`, {
+        "q": "[{\"parent\" : null}]"
+    })
 
 const actionRootCats = () =>
     actionPromise('rootCats', gqlRootCats())
 
-//Запит для отримання однієї категорії з товарами та картинками
 
-const gqlCatOne = () =>
-    gql(`query oneCatWithGoodsImgs ($id: String){
-    CategoryFindOne([{_id}]: $id){
-    name 
-    goods {
-      name images {
+////////////////
+//Запит для отримання однієї категорії з товарами та картинками
+////////////////
+const gqlRootCatOne = (_id) =>
+    gql(`query oneCatWithGoodsImgs($q: String){
+   CategoryFindOne (query: $q){
+    _id
+    name
+    image{
+      url
+    }
+    goods{
+      _id
+      name
+      images{
         url
       }
-    } 
+    }
   }
-} `)
+}`, {
+        "q": JSON.stringify([{_id : _id}])
+    })
+
+const actionRootCatOne = (_id= "6262ca7dbf8b206433f5b3d1") =>
+    actionPromise('rootCatOne', gqlRootCatOne(_id));
 
 
+////////////////
+//Запит на отримання товару з описом та картинками
+////////////////
+const gqlGoodOne = (_id) =>
+    gql(`query goodFindOne ($q: String) {
+  GoodFindOne(query: $q){
+    _id
+    images{
+      url
+    }
+    name
+    price
+    description
+  }
+}`, {
+        "q": JSON.stringify([{_id : _id}])
+    });
+
+const actionGoodOne = (_id = "62d3099ab74e1f5f2ec1a125") =>
+    actionPromise('goodOne', gqlGoodOne(_id));
 
 
+////////////////
+//Запит на реєстрацію
+////////////////
+const gqlRegistration = (log, pass) =>
+    gql(`mutation reg ($log: String, $pass: String){
+  UserUpsert(user:{
+    login:$log, password:$pass
+  }){
+    _id
+    login
+  }
+}`, {
+        "log": log,
+        "pass": pass
+    })
 
-const store = createStore(promiseReducer)
-store.subscribe(() => console.log(store.getState())) //має запускатися 6 разів
+const actionRegistration = (log, pass) =>
+    actionPromise('register', gqlRegistration(log, pass));
 
-store.dispatch(actionRootCats());
+
+////////////////
+//Запит на логін
+////////////////
+const gqlLogin = (log, pass) =>
+    gql(`query login ($log:String, $pass:String) {
+  login (login: $log, password: $pass)
+}`, {
+        "log": log,
+        "pass": pass
+    })
+
+const actionLogin = (log, pass) =>
+    actionPromise('login', gqlLogin(log, pass));
+
+
+////////////////
+//Запит історії замовлень
+////////////////
+const gqlHistory = () =>
+    gql(`query history ($q:String) {
+  OrderFind(query: $q){
+    _id
+    createdAt
+    total
+  }
+}`,{
+        "q": "[{}]"
+    })
+
+const actionHistory = () =>
+    actionPromise('history', gqlHistory())
+
+
+////////////////
+//Запит оформлення замовлення
+////////////////
+const gqlOrder = (count, _id) =>
+    gql(`mutation newOrder($goods: [OrderGoodInput]) {
+      OrderUpsert(order: {orderGoods: $goods}) {
+        _id 
+        createdAt 
+        total
+      }
+    }`,{
+        "goods": [{"count": count, "good": { "_id": _id}}]
+    })
+
+const actionOrder = (count, _id) =>
+    actionPromise('order', gqlOrder(count, _id))
+
+const store = createStore(promiseReducer);
+store.subscribe(() => console.log(store.getState()))
+
+store.dispatch(actionOrder(4, '62d3099ab74e1f5f2ec1a125'));
+
 
