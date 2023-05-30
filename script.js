@@ -26,6 +26,29 @@ function createStore(reducer){
 
 
 /////////////////////////////////////////////////////////////
+//combineReducer
+/////////////////////////////////////////////////////////////
+function combineReducers(reducers) {
+    function totalReducer(totalState = {}, action) {
+        const newTotalState = {}
+        for (const [reducerName, childReducer] of Object.entries(reducers)) {
+            const newState = childReducer(totalState[reducerName], action)
+            if (newState !== totalState[reducerName]) {
+                newTotalState[reducerName] = newState
+            }
+        }
+
+        if (Object.values(newTotalState).length) {
+            return { ...totalState, ...newTotalState }
+        }
+        return totalState
+    }
+    return totalReducer
+}
+
+
+
+/////////////////////////////////////////////////////////////
 //promiseReducer
 /////////////////////////////////////////////////////////////
 function promiseReducer(state= {}, {type, promiseName, status, payload, error}){
@@ -54,51 +77,6 @@ const actionPromise = (promiseName, promise) =>
             dispatch(actionRejected(promiseName, error))
         }
     }
-
-
-
-/////////////////////////////////////////////////////////////
-//authReducer
-/////////////////////////////////////////////////////////////
-function jwtDecode (token) {
-    try {
-        const arr = token.split('.')
-        const encodedData = arr[1];
-        const decodedData = atob(encodedData);
-        return JSON.parse(decodedData);
-
-    } catch (error){
-        return undefined;
-    }
-}
-
-function authReducer (state = {}, {type, token}) {
-    if (type === 'AUTH_LOGIN'){
-        if (token){
-            const decodedData = jwtDecode(token);
-
-            localStorage.authToken = token;
-
-            if (decodedData){
-                return {
-                    ...state,
-                    token,
-                    payload: decodedData,
-                }
-            }
-        }
-
-        return {};
-    }
-    if (type === 'AUTH_LOGOUT'){
-        return {};
-    }
-
-    return state
-}
-
-const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
-const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
 
 
 
@@ -284,6 +262,7 @@ const gqlRootCatOne = (_id) =>
     goods{
       _id
       name
+      price
       images{
         url
       }
@@ -293,7 +272,7 @@ const gqlRootCatOne = (_id) =>
         "q": JSON.stringify([{_id : _id}])
     })
 
-const actionRootCatOne = (_id= "6262ca7dbf8b206433f5b3d1") =>
+const actionRootCatOne = (_id) =>
     actionPromise('rootCatOne', gqlRootCatOne(_id));
 
 
@@ -316,7 +295,7 @@ const gqlGoodOne = (_id) =>
         "q": JSON.stringify([{_id : _id}])
     });
 
-const actionGoodOne = (_id = "62d3099ab74e1f5f2ec1a125") =>
+const actionGoodOne = (_id) =>
     actionPromise('goodOne', gqlGoodOne(_id));
 
 
@@ -393,6 +372,243 @@ const gqlOrder = (count, _id) =>
 
 const actionOrder = (count, _id) =>
     actionPromise('order', gqlOrder(count, _id))
+
+
+
+/////////////////////////////////////////////////////////////
+//authReducer
+/////////////////////////////////////////////////////////////
+function jwtDecode (token) {
+    try {
+        const arr = token.split('.')
+        const encodedData = arr[1];
+        const decodedData = atob(encodedData);
+        return JSON.parse(decodedData);
+
+    } catch (error){
+        return undefined;
+    }
+}
+
+function authReducer (state = {}, {type, token}) {
+    if (type === 'AUTH_LOGIN'){
+        if (token){
+            const decodedData = jwtDecode(token);
+
+            localStorage.authToken = token;
+
+            if (decodedData){
+                return {
+                    ...state,
+                    token,
+                    payload: decodedData,
+                }
+            }
+        }
+
+        return {};
+    }
+    if (type === 'AUTH_LOGOUT'){
+        delete localStorage.authToken;
+        return {};
+    }
+
+    return state
+}
+
+const actionAuthLogin  = (token) => ({type: 'AUTH_LOGIN', token})
+const actionAuthLogout = () => ({type: 'AUTH_LOGOUT'})
+
+
+/////////////////////////////////////////////////////////////
+//THUNK FullLogin && FullRegistration
+/////////////////////////////////////////////////////////////
+const actionFullLogin = (login, password) =>
+    async dispatch => {
+        const token = await dispatch(actionLogin(login, password))
+
+        if (token && typeof token === 'string') {
+            await dispatch(actionAuthLogin(token));
+        }
+    };
+
+// const store = createStore(authReducer);
+// store.subscribe(() => console.log(store.getState()));
+// store.dispatch(actionFullLogin("vlad21", "test"))
+
+// const actionFullRegistration = (login, password) =>
+//     async dispatch => {
+//     try {
+//
+//     }
+//         const token = await dispatch(actionLogin(login, password))
+//
+//         if (token && typeof token === 'string') {
+//             await dispatch(actionAuthLogin(token));
+//         }
+//     };
+
+
+
+/////////////////////////////////////////////////////////////
+//REDUCERS COMBINE
+/////////////////////////////////////////////////////////////
+const reducers = {
+    promise: promiseReducer,
+    auth: authReducer,
+    cart: cartReducer,
+};
+// const store = createStore(combineReducers(reducers));
+
+
+/////////////////////////////////////////////////////////////
+////////////////////////////DOM//////////////////////////////
+/////////////////////////////////////////////////////////////
+//ASIDE
+/////////////////////////////////////////////////////////////
+const categoryList = document.getElementById('category-list');
+
+const  store = createStore(promiseReducer)
+store.dispatch(actionRootCats())
+store.subscribe(() => {
+    const rootCats = store.getState().rootCats;
+    const rootCatsCategory = rootCats.payload.CategoryFind;
+
+    categoryList.innerHTML = '';
+    for (const cat of rootCatsCategory) {
+        const li = document.createElement('li')
+        const a = document.createElement('a');
+        a.innerText = cat.name;
+        a.href = `#/category/${cat._id}`;
+        li.appendChild(a)
+        categoryList.appendChild(li);
+    }
+})
+
+
+
+/////////////////////////////////////////////////////////////
+//oneCategories
+/////////////////////////////////////////////////////////////
+const content = document.getElementById('content');
+const contentTitle = document.getElementById('content-title');
+
+store.subscribe(() => {
+    const rootCatOne = store.getState().rootCatOne;
+
+    if (rootCatOne && rootCatOne.error) {
+        console.log(rootCatOne.error);
+    }
+    if (
+        rootCatOne &&
+        rootCatOne.status === "FULFILLED"
+    ) {
+        const rootCatOneCategory = rootCatOne.payload.CategoryFindOne;
+        content.innerHTML = '';
+
+        contentTitle.innerText = rootCatOneCategory.name;
+        for (let good of rootCatOneCategory.goods) {
+            const cardContainer = document.createElement("a");
+            cardContainer.href = `#/good/${good._id}`;
+            const goodDiv = document.createElement("div");
+            cardContainer.classList.add("good-card");
+
+            const goodPhoto = document.createElement("img");
+            const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
+            goodPhoto.src = imageURL;
+            goodDiv.appendChild(goodPhoto);
+
+            const goodName = document.createElement("h5");
+            goodName.innerText = good.name;
+            goodDiv.appendChild(goodName);
+
+            const goodPrice = document.createElement("p");
+            goodPrice.innerText = `Ціна: ${good.price} грн`;
+            goodDiv.appendChild(goodPrice);
+
+            const addToCartBtn = document.createElement('button');
+            addToCartBtn.innerText = 'Додати до кошика';
+            addToCartBtn.classList.add('add-to-cart-btn');
+            goodDiv.appendChild(addToCartBtn);
+
+            cardContainer.appendChild(goodDiv);
+            content.appendChild(cardContainer);
+        }
+    }
+});
+
+
+/////////////////////////////////////////////////////////////
+//oneCategories
+/////////////////////////////////////////////////////////////
+store.subscribe(() => {
+    const goodOne  = store.getState().goodOne;
+
+    if (goodOne && goodOne.error) {
+        console.log(goodOne.error);
+    }
+    if (
+        goodOne &&
+        goodOne.status === "FULFILLED"
+    ) {
+        const goodOneData = goodOne.payload.GoodFindOne;
+        content.innerHTML = '';
+
+        contentTitle.innerText = goodOneData.name;
+        // for (let good of goodOneData.goods) {
+        //     const cardContainer = document.createElement("a");
+        //     cardContainer.href = `#/good/${good._id}`;
+        //     const goodDiv = document.createElement("div");
+        //     cardContainer.classList.add("good-description");
+        //
+        //     const goodPhoto = document.createElement("img");
+        //     const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
+        //     goodPhoto.src = imageURL;
+        //     goodDiv.appendChild(goodPhoto);
+        //
+        //     const goodName = document.createElement("h5");
+        //     goodName.innerText = good.name;
+        //     goodDiv.appendChild(goodName);
+        //
+        //     const goodPrice = document.createElement("p");
+        //     goodPrice.innerText = `Ціна: ${good.price} грн`;
+        //     goodDiv.appendChild(goodPrice);
+        //
+        //     const addToCartBtn = document.createElement('button');
+        //     addToCartBtn.innerText = 'Додати до кошика';
+        //     addToCartBtn.classList.add('add-to-cart-btn');
+        //     goodDiv.appendChild(addToCartBtn);
+        //
+        //     cardContainer.appendChild(goodDiv);
+        //     content.appendChild(cardContainer);
+        // }
+    }
+
+});
+
+
+/////////////////////////////////////////////////////////////
+//onhashchange
+/////////////////////////////////////////////////////////////
+onhashchange = () => {
+    console.log(window.location.hash);
+    const name = window.location.hash.split("/")[1];
+    const _id = window.location.hash.split("/")[2];
+    if (name === "category") {
+        store.dispatch(actionRootCatOne(_id));
+    }
+    if (name === "good") {
+        store.dispatch(actionGoodOne(_id));
+    }
+    if (name === "history") {
+    }
+    if (name === "register") {
+    }
+    if (name === "login") {
+    }
+    if (name === "cart") {
+    }
+};
 
 
 
