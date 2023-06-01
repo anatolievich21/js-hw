@@ -10,7 +10,7 @@
 html,
 body {
     height: 100%;
-    background-color: #fdfdfd;
+    background-color: #fbfbfb;
     font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
     color: #ffffff;
     font-size: 16px;
@@ -22,11 +22,29 @@ header {
     justify-content: space-between;
     align-items: center;
     padding: 10px;
-    background-color: #323232;
+    background-color: #1c1c1c;
 }
 
 header h1 {
     margin: 0;
+}
+
+#content-header {
+    display: flex;
+    flex-direction: row;
+}
+/* Стилі для іконок */
+.icon img{
+    display: inline-block;
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.icon img:hover {
+    transform: scale(1.1);
 }
 
 /* Стилі для бічної панелі */
@@ -75,8 +93,16 @@ main {
 }
 
 #content-title {
+    display: flex;
     text-transform: uppercase;
+    font-size: 24px;
+    font-weight: bold;
     margin-bottom: 10px;
+}
+
+.category-img{
+    margin-left: 10px;
+    height: 24px;
 }
 
 .good-card {
@@ -95,12 +121,12 @@ main {
     height: 340px;
     box-sizing: border-box;
     position: relative;
-    transition: transform 0.4s;
+    transition: transform 0.1s;
 }
 
 .good-card:hover {
     background-color: #ffffff;
-    transform: translateY(-2px);
+    transform: translateY(-3px);
 }
 
 .good-card img {

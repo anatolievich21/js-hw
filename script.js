@@ -472,10 +472,10 @@ const  store = createStore(promiseReducer)
 store.dispatch(actionRootCats())
 store.subscribe(() => {
     const rootCats = store.getState().rootCats;
-    const rootCatsCategory = rootCats.payload.CategoryFind;
+    const category = rootCats.payload.CategoryFind;
 
     categoryList.innerHTML = '';
-    for (const cat of rootCatsCategory) {
+    for (const cat of category) {
         const li = document.createElement('li')
         const a = document.createElement('a');
         a.innerText = cat.name;
@@ -495,6 +495,11 @@ const contentTitle = document.getElementById('content-title');
 
 store.subscribe(() => {
     const rootCatOne = store.getState().rootCatOne;
+    const name = window.location.hash.split("/")[1];
+
+    if (name !== "category") {
+        return;
+    }
 
     if (rootCatOne && rootCatOne.error) {
         console.log(rootCatOne.error);
@@ -503,37 +508,49 @@ store.subscribe(() => {
         rootCatOne &&
         rootCatOne.status === "FULFILLED"
     ) {
-        const rootCatOneCategory = rootCatOne.payload.CategoryFindOne;
+        const oneCategory = rootCatOne.payload.CategoryFindOne;
 
         content.innerHTML = '';
 
-        contentTitle.innerText = rootCatOneCategory.name;
-        for (let good of rootCatOneCategory.goods) {
-            const cardsContainer = document.createElement("a");
-            cardsContainer.href = `#/good/${good._id}`;
-            const goodDiv = document.createElement("div");
-            cardsContainer.classList.add("good-card");
+        contentTitle.innerText = oneCategory.name;
+        
+        if (oneCategory?.image?.url){
+            const photoCategory = document.createElement("img");
+            const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + oneCategory.image.url;
+            photoCategory.src = imageURL;
+            photoCategory.classList.add("category-img");
+            contentTitle.appendChild(photoCategory);
 
-            const goodPhoto = document.createElement("img");
-            const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
-            goodPhoto.src = imageURL;
-            goodDiv.appendChild(goodPhoto);
+        }
 
-            const goodName = document.createElement("h5");
-            goodName.innerText = good.name;
-            goodDiv.appendChild(goodName);
+        if (oneCategory){
+            for (let good of oneCategory.goods) {
+                const cardsContainer = document.createElement("a");
+                cardsContainer.href = `#/good/${good._id}`;
+                const goodDiv = document.createElement("div");
+                cardsContainer.classList.add("good-card");
 
-            const goodPrice = document.createElement("p");
-            goodPrice.innerText = `Ціна: ${good.price} грн`;
-            goodDiv.appendChild(goodPrice);
+                const goodPhoto = document.createElement("img");
+                const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
+                goodPhoto.src = imageURL;
+                goodDiv.appendChild(goodPhoto);
 
-            const addToCartBtn = document.createElement('button');
-            addToCartBtn.innerText = 'Додати до кошика';
-            addToCartBtn.classList.add('add-to-cart-btn');
-            goodDiv.appendChild(addToCartBtn);
+                const goodName = document.createElement("h5");
+                goodName.innerText = good.name;
+                goodDiv.appendChild(goodName);
 
-            cardsContainer.appendChild(goodDiv);
-            content.appendChild(cardsContainer);
+                const goodPrice = document.createElement("p");
+                goodPrice.innerText = `Ціна: ${good.price} грн`;
+                goodDiv.appendChild(goodPrice);
+
+                const addToCartBtn = document.createElement('button');
+                addToCartBtn.innerText = 'Додати до кошика';
+                addToCartBtn.classList.add('add-to-cart-btn');
+                goodDiv.appendChild(addToCartBtn);
+
+                cardsContainer.appendChild(goodDiv);
+                content.appendChild(cardsContainer);
+            }
         }
     }
 });
@@ -544,6 +561,11 @@ store.subscribe(() => {
 /////////////////////////////////////////////////////////////
 store.subscribe(() => {
     const goodOne  = store.getState().goodOne;
+    const name = window.location.hash.split("/")[1];
+
+    if (name !== "good") {
+        return;
+    }
 
     if (goodOne && goodOne.error) {
         console.log(goodOne.error);
@@ -583,20 +605,58 @@ store.subscribe(() => {
         const addToCartBtn = document.createElement('a');
         addToCartBtn.innerText = 'Додати до кошика';
         addToCartBtn.classList.add('add-to-cart-btn-in-good');
-        addToCartBtn.href  = `#/good/${goodOneData._id}`;
         test.appendChild(addToCartBtn);
 
         content.appendChild(goodContainer);
 
-        // addToCartBtn.onclick = () => {
-        //     store.dispatch(actionCartAdd(goodOneData));
-        // };
+        addToCartBtn.onclick = () => {
+            store.dispatch(actionCartAdd(goodName));
+        };
 
     }
-
-
-
 });
+
+
+
+/////////////////////////////////////////////////////////////
+//history
+/////////////////////////////////////////////////////////////
+const buttonHistory = document.getElementById('icon-history')
+
+store.subscribe(() => {
+    const order = store.getState().history;
+    const name = window.location.hash.split("/")[1];
+    buttonHistory.href = `#/history/`;
+    if (name !== "history") {
+        return;
+    }
+
+    if (order && order.error) {
+        console.log(order.error);
+    }
+    if (
+        order &&
+        order.status === "FULFILLED"
+    ) {
+        const orderData = order.payload.OrderFind;
+        contentTitle.innerText = "Історія замовлень";
+        content.innerHTML = '';
+
+        if (orderData !== orderData.length){
+            const mess = document.createElement('h3');
+            mess.innerText = "Замовлення відсутні, але Ви завжди можете придбати щось в нашому магазині!";
+            return content.appendChild(mess);
+        }
+
+        for (const cat of orderData) {
+            const a = document.createElement('a');
+            a.innerText = cat.name;
+            a.href = `#/category/${cat._id}`;
+            content.appendChild(a);
+        }
+    }
+});
+
 
 
 /////////////////////////////////////////////////////////////
@@ -613,6 +673,7 @@ onhashchange = () => {
         store.dispatch(actionGoodOne(_id));
     }
     if (name === "history") {
+        store.dispatch(actionHistory());
     }
     if (name === "register") {
     }
