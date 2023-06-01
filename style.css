@@ -57,13 +57,12 @@ aside ul li a{
 }
 
 aside ul li a:hover{
-    text-decoration: none;
     color: white;
 }
 
 /* Стилі для основного контейнера */
 main {
-    margin-left: 200px; /* Щоб основний контейнер з'явився справа від aside */
+    margin-left: 200px;
     padding: 20px;
     background-color: #fdfdfd;
     color: #000000;
@@ -72,7 +71,7 @@ main {
 #content {
     display: flex;
     flex-wrap: wrap;
-    /*justify-content: space-evenly;*/
+
 }
 
 #content-title {
@@ -95,7 +94,7 @@ main {
     width: 260px;
     height: 340px;
     box-sizing: border-box;
-    position: relative; /* Додано позиціонування */
+    position: relative;
     transition: transform 0.4s;
 }
 
@@ -114,20 +113,20 @@ main {
 .good-card h5 {
     font-size: 18px;
     margin-bottom: 5px;
-    position: absolute; /* Додано позиціонування */
-    bottom: 100px; /* Встановлено відстань від нижнього краю */
-    left: 10px; /* Вирівняно ліворуч */
-    right: 10px; /* Вирівняно праворуч */
-    /*margin-bottom: auto; !* Змінено на auto *!*/
+    position: absolute;
+    bottom: 100px;
+    left: 10px;
+    right: 10px;
+
 }
 
 .good-card p {
     font-size: 16px;
     margin-bottom: 10px;
-    position: absolute; /* Додано позиціонування */
-    bottom: 60px; /* Встановлено відстань від нижнього краю */
-    left: 0; /* Вирівняно ліворуч */
-    right: 0; /* Вирівняно праворуч */
+    position: absolute;
+    bottom: 60px;
+    left: 0;
+    right: 0;
 }
 
 .add-to-cart-btn {
@@ -140,14 +139,66 @@ main {
     font-size: 14px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    position: absolute; /* Додано позиціонування */
-    bottom: 20px; /* Встановлено відстань від нижнього краю */
-    left: 40px; /* Вирівняно ліворуч */
-    right: 40px; /* Вирівняно праворуч */
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    right: 40px;
 }
 
 .add-to-cart-btn:hover {
     background-color: #23527c;
 }
 
+.good-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    border: 1px solid black;
+}
 
+.good-description img {
+    width: auto;
+    height: 250px;
+    margin-bottom: 10px;
+}
+
+.good-description h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.good-description div {
+    min-width: 200px;
+    max-width: 1400px;
+}
+
+.test {
+    display: flex;
+    flex-direction: row;
+    padding: 20px;
+}
+
+.good-description p {
+    padding: 10px 20px;
+    background-color: #0bc45d;
+    color: #ffffff;
+    border-radius: 5px 0 0 5px;
+    font-size: 16px;
+}
+
+.add-to-cart-btn-in-good {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    cursor: pointer;
+    border-radius: 0 5px 5px 0;
+    font-size: 16px;
+}
+
+.add-to-cart-btn-in-good:hover {
+    background-color: #0056b3;
+}

@@ -504,14 +504,15 @@ store.subscribe(() => {
         rootCatOne.status === "FULFILLED"
     ) {
         const rootCatOneCategory = rootCatOne.payload.CategoryFindOne;
+
         content.innerHTML = '';
 
         contentTitle.innerText = rootCatOneCategory.name;
         for (let good of rootCatOneCategory.goods) {
-            const cardContainer = document.createElement("a");
-            cardContainer.href = `#/good/${good._id}`;
+            const cardsContainer = document.createElement("a");
+            cardsContainer.href = `#/good/${good._id}`;
             const goodDiv = document.createElement("div");
-            cardContainer.classList.add("good-card");
+            cardsContainer.classList.add("good-card");
 
             const goodPhoto = document.createElement("img");
             const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
@@ -531,15 +532,15 @@ store.subscribe(() => {
             addToCartBtn.classList.add('add-to-cart-btn');
             goodDiv.appendChild(addToCartBtn);
 
-            cardContainer.appendChild(goodDiv);
-            content.appendChild(cardContainer);
+            cardsContainer.appendChild(goodDiv);
+            content.appendChild(cardsContainer);
         }
     }
 });
 
 
 /////////////////////////////////////////////////////////////
-//oneCategories
+//oneGood
 /////////////////////////////////////////////////////////////
 store.subscribe(() => {
     const goodOne  = store.getState().goodOne;
@@ -554,35 +555,46 @@ store.subscribe(() => {
         const goodOneData = goodOne.payload.GoodFindOne;
         content.innerHTML = '';
 
-        contentTitle.innerText = goodOneData.name;
-        // for (let good of goodOneData.goods) {
-        //     const cardContainer = document.createElement("a");
-        //     cardContainer.href = `#/good/${good._id}`;
-        //     const goodDiv = document.createElement("div");
-        //     cardContainer.classList.add("good-description");
-        //
-        //     const goodPhoto = document.createElement("img");
-        //     const imageURL = `http://shop-roles.node.ed.asmer.org.ua/` + good.images[0].url;
-        //     goodPhoto.src = imageURL;
-        //     goodDiv.appendChild(goodPhoto);
-        //
-        //     const goodName = document.createElement("h5");
-        //     goodName.innerText = good.name;
-        //     goodDiv.appendChild(goodName);
-        //
-        //     const goodPrice = document.createElement("p");
-        //     goodPrice.innerText = `Ціна: ${good.price} грн`;
-        //     goodDiv.appendChild(goodPrice);
-        //
-        //     const addToCartBtn = document.createElement('button');
-        //     addToCartBtn.innerText = 'Додати до кошика';
-        //     addToCartBtn.classList.add('add-to-cart-btn');
-        //     goodDiv.appendChild(addToCartBtn);
-        //
-        //     cardContainer.appendChild(goodDiv);
-        //     content.appendChild(cardContainer);
-        // }
+        const goodContainer = document.createElement("div");
+        goodContainer.classList.add("good-description");
+
+        for (let img of goodOneData.images) {
+            let goodPhoto = document.createElement("img");
+            goodPhoto.src = `http://shop-roles.node.ed.asmer.org.ua/${img.url}`;
+            goodContainer.appendChild(goodPhoto);
+        }
+
+        const goodName = document.createElement("h2");
+        goodName.innerText = goodOneData.name;
+        goodContainer.appendChild(goodName);
+
+        const goodDescription = document.createElement("div");
+        goodDescription.innerText = goodOneData.description;
+        goodContainer.appendChild(goodDescription);
+
+        const test = document.createElement("div");
+        test.classList.add('test');
+        goodContainer.appendChild(test);
+
+        const goodPrice = document.createElement("p");
+        goodPrice.innerText = `Ціна: ${goodOneData.price} грн`;
+        test.appendChild(goodPrice);
+
+        const addToCartBtn = document.createElement('a');
+        addToCartBtn.innerText = 'Додати до кошика';
+        addToCartBtn.classList.add('add-to-cart-btn-in-good');
+        addToCartBtn.href  = `#/good/${goodOneData._id}`;
+        test.appendChild(addToCartBtn);
+
+        content.appendChild(goodContainer);
+
+        // addToCartBtn.onclick = () => {
+        //     store.dispatch(actionCartAdd(goodOneData));
+        // };
+
     }
+
+
 
 });
 
