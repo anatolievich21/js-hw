@@ -458,7 +458,7 @@ const reducers = {
     auth: authReducer,
     cart: cartReducer,
 };
-// const store = createStore(combineReducers(reducers));
+const store = createStore(combineReducers(reducers));
 
 
 /////////////////////////////////////////////////////////////
@@ -468,11 +468,11 @@ const reducers = {
 /////////////////////////////////////////////////////////////
 const categoryList = document.getElementById('category-list');
 
-const  store = createStore(promiseReducer)
+// const  store = createStore(promiseReducer)
 store.dispatch(actionRootCats())
 store.subscribe(() => {
-    const rootCats = store.getState().rootCats;
-    const category = rootCats.payload.CategoryFind;
+    const rootCats = store.getState().promise.rootCats;
+    const category = rootCats?.payload?.CategoryFind;
 
     categoryList.innerHTML = '';
     for (const cat of category) {
@@ -494,7 +494,7 @@ const content = document.getElementById('content');
 const contentTitle = document.getElementById('content-title');
 
 store.subscribe(() => {
-    const rootCatOne = store.getState().rootCatOne;
+    const rootCatOne = store.getState().promise.rootCatOne;
     const name = window.location.hash.split("/")[1];
 
     if (name !== "category") {
@@ -508,7 +508,7 @@ store.subscribe(() => {
         rootCatOne &&
         rootCatOne.status === "FULFILLED"
     ) {
-        const oneCategory = rootCatOne.payload.CategoryFindOne;
+        const oneCategory = rootCatOne?.payload?.CategoryFindOne;
 
         content.innerHTML = '';
 
@@ -560,7 +560,7 @@ store.subscribe(() => {
 //oneGood
 /////////////////////////////////////////////////////////////
 store.subscribe(() => {
-    const goodOne  = store.getState().goodOne;
+    const goodOne  = store.getState().promise.goodOne;
     const name = window.location.hash.split("/")[1];
 
     if (name !== "good") {
@@ -574,7 +574,7 @@ store.subscribe(() => {
         goodOne &&
         goodOne.status === "FULFILLED"
     ) {
-        const goodOneData = goodOne.payload.GoodFindOne;
+        const goodOneData = goodOne?.payload?.GoodFindOne;
         content.innerHTML = '';
 
         const goodContainer = document.createElement("div");
@@ -610,7 +610,7 @@ store.subscribe(() => {
         content.appendChild(goodContainer);
 
         addToCartBtn.onclick = () => {
-            store.dispatch(actionCartAdd(goodName));
+            store.dispatch(actionCartAdd(goodOneData));
         };
 
     }
@@ -624,9 +624,10 @@ store.subscribe(() => {
 const buttonHistory = document.getElementById('icon-history')
 
 store.subscribe(() => {
-    const order = store.getState().history;
+    const order = store.getState().promise.history;
     const name = window.location.hash.split("/")[1];
     buttonHistory.href = `#/history/`;
+
     if (name !== "history") {
         return;
     }
@@ -638,7 +639,7 @@ store.subscribe(() => {
         order &&
         order.status === "FULFILLED"
     ) {
-        const orderData = order.payload.OrderFind;
+        const orderData = order?.payload?.OrderFind;
         contentTitle.innerText = "Історія замовлень";
         content.innerHTML = '';
 
